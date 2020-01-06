@@ -2,6 +2,7 @@
 # coding=utf-8
 
 
+
 from MainWindow import MainWindow
 from LoadConfig import LoadConfig
 from tkinter import Tk
