@@ -3,7 +3,8 @@
 
 from pathlib import *
 import json
-
+import os
+import subprocess
 
 class LoadConfig ():
     def __init__(self, file):
@@ -38,11 +39,18 @@ class LoadConfig ():
         dict1['ORDER'] = order
         return order
 
-    def tools(self):
-        pass
-
+    def getTools(self):
+        if self.configuration != False:
+            tools = self.configuration['tools']
+            for tool in sorted(tools):
+                if not os.path.exists(tools[tool]['bin']):
+                    print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
+                    del (tools[tool])
+        return tools
 
 if __name__ == "__main__":
     conf = LoadConfig('YARCoM.conf')
     root = conf.LoadEquipments()
-    print(root)
+    toolList = conf.getTools()
+    # print(root)
+    print(toolList)
