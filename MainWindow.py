@@ -15,13 +15,14 @@ class MainWindow (Tk):
         self.title(windowTitle)
 
     def InitWidgets(self, equipmentList, toolsList):
+        self.toolList = toolsList
         self.equipmentList = equipmentList
         self.grid()
         self.InitTreeWidget()
         self.InitEntryWidget()
         self.InitButtonWidget()
         self.InitMenuWidget()
-        self.InitContextMenuWidget(toolsList)
+        self.InitContextMenuWidget()
 
         self.tree.grid(row=0, column=0, columnspan=2, sticky='NS')
         self.entry.grid(row=1, column=0, sticky='EW')
@@ -70,23 +71,25 @@ class MainWindow (Tk):
         self.helpMenu.add_command(label="About...")
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
 
-    def InitContextMenuWidget(self, toolsList):
+    def InitContextMenuWidget(self):
         self.popupMenu = Menu(self, tearoff=0)
         # print(toolsList)
-        for tool in sorted(toolsList):
-            self.popupMenu.add_command(label=str(tool) + '.' + toolsList[tool]['name'],
-                                       command=lambda arg=(toolsList[tool]): self.RunTool(arg))
+        for tool in sorted(self.toolList):
+            self.popupMenu.add_command(label=str(tool) + '.' + self.toolList[tool]['name'],
+                                       command=lambda arg=(self.toolList[tool]): self.RunToolFromContextMenu(arg))
 
-    def RunTool(self, toolList):
+    def RunToolFromContextMenu(self, tool):
         item = self.popupMenu.selection
         if self.tree.exists(item):
             # print(f"{item}")
             # self.tree.selection_set(item)
-            print("item: {}, tool= {}".format(self.tree.item(item), toolList))
+            print("item: {}, tool= {}".format(self.tree.item(item), tool))
             if len(self.tree.item(item)['values']) != 0:
                 ip = self.tree.item(item)['values'][0]
-                myArgs = ' '.join([toolList['bin'], toolList['args'], ip])
-                subprocess.Popen(myArgs, shell=True)
+                if (tool['args'] == ''):
+                    subprocess.Popen([tool['bin'], ip], shell=True)
+                else:
+                    subprocess.Popen([tool['bin'], tool['args'], ip], shell=True)
             else:
                 print("Not only one IP in list !")
 
@@ -143,20 +146,35 @@ class MainWindow (Tk):
             item_value = self.tree.item(item, "value")
             if item_value != "":
                 for value in item_value:
-                    print("{} -> {}".format(item_text, value))
+                    print("TreeOnSelect: {} -> {}".format(item_text, value))
             else:
                 self.tree.selection_remove(item)
 
     def TreeOnKeyPress(self, event):
-        pass
+        self.RunToolFromTree()
 
     def TreeOnDoubleClick(self, event):
-        # self.popupMenu.add_command(label=toolsList[tool]['name'])
-        #             # command=subprocess.run([toolsList[tool]['bin'],"10.5.3.244",toolsList[tool]['args']]))
-        pass
+        self.RunToolFromTree()
+
+    def RunToolFromTree (self):
+        defaultTool = self.toolList["1"]
+        print (defaultTool)
+        for item in self.tree.selection():
+            item_text = self.tree.item(item, "text")
+            item_value = self.tree.item(item, "value")
+            if item_value != "":
+                for value in item_value:
+                    print("TreeOnDoubleClick: {} -> {}".format(item_text, value))
+                    ip = value
+                    if (defaultTool['args'] == ''):
+                        subprocess.Popen([defaultTool['bin'], ip], shell=True)
+                    else:
+                        subprocess.Popen([defaultTool['bin'], defaultTool['args'], ip], shell=True)
+            else:
+                self.tree.selection_remove(item)
 
     def TreeOnRightClick(self, event):
-        self.bind("<Button-3>", self.PopUp)
+        self.PopUp (event)
 
     def EntryOnPressReturn(self, event):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
