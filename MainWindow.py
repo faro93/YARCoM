@@ -4,8 +4,9 @@
 from tkinter import *       # pylint disable=unused-wildcard-import
 from tkinter import ttk     # pylint disable=unused-wildcard-import
 from LoadConfig import LoadConfig
+from HelpWindow import HelpWindow
 import subprocess
-import shlex
+# import shlex
 
 
 class MainWindow (Tk):
@@ -42,7 +43,7 @@ class MainWindow (Tk):
         self.tree.config(height=20, selectmode='browse')
 
         self.tree.bind('<<TreeviewSelect>>', self.TreeOnSelect)
-        self.tree.bind('<Key>', self.TreeOnKeyPress)
+        self.tree.bind('<Return>', self.TreeOnKeyPress)
         self.tree.bind('<Double-Button-1>', self.TreeOnDoubleClick)
         self.tree.bind('<Button-3>', self.TreeOnRightClick)
 
@@ -68,8 +69,13 @@ class MainWindow (Tk):
         self.menuBar.add_cascade(label="File", menu=self.fileMenu)
 
         self.helpMenu = Menu(self.menuBar, tearoff=0)
-        self.helpMenu.add_command(label="About...")
+        self.helpMenu.add_command(label="About...", command=self.Help)
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
+
+    def Help(self):
+        print ("Help menu")
+        helpWindowTitle = "YARCoM v0.1 - About"
+        helpWindow = HelpWindow(None, helpWindowTitle)
 
     def InitContextMenuWidget(self):
         self.popupMenu = Menu(self, tearoff=0)
