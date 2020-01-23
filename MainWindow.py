@@ -73,9 +73,9 @@ class MainWindow (Tk):
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
 
     def Help(self):
-        print ("Help menu")
-        helpWindowTitle = "YARCoM v0.1 - About"
-        helpWindow = HelpWindow(None, helpWindowTitle)
+        helpWindowTitle = "About..."
+        print ("Help menu "+ helpWindowTitle+' '+windowTitle)
+        helpWindow = HelpWindow(None, helpWindowTitle, windowTitle)
 
     def InitContextMenuWidget(self):
         self.popupMenu = Menu(self, tearoff=0)
