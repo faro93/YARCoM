@@ -5,6 +5,7 @@ from tkinter import *       # pylint disable=unused-wildcard-import
 from tkinter import ttk     # pylint disable=unused-wildcard-import
 from LoadConfig import LoadConfig
 from HelpWindow import HelpWindow
+from AboutWindow import AboutWindow
 import subprocess
 # import shlex
 
@@ -69,13 +70,19 @@ class MainWindow (Tk):
         self.menuBar.add_cascade(label="File", menu=self.fileMenu)
 
         self.helpMenu = Menu(self.menuBar, tearoff=0)
-        self.helpMenu.add_command(label="About...", command=self.Help)
+        self.helpMenu.add_command(label="Help...", command=self.Help)
+        self.helpMenu.add_separator()
+        self.helpMenu.add_command(label="About...", command=self.About)
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
 
     def Help(self):
-        helpWindowTitle = "About..."
-        print ("Help menu "+ helpWindowTitle+' '+windowTitle)
+        helpWindowTitle = "Help..."
+        # print ("Help menu "+ helpWindowTitle+' '+windowTitle)
         helpWindow = HelpWindow(None, helpWindowTitle, windowTitle)
+
+    def About(self):
+        aboutWindowTitle = "About..."
+        aboutWindow = AboutWindow(None, aboutWindowTitle, windowTitle)
 
     def InitContextMenuWidget(self):
         self.popupMenu = Menu(self, tearoff=0)

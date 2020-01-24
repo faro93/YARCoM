@@ -15,18 +15,8 @@ class HelpWindow (Tk):
     
     def InitWindow(self):
         self.grid()
-        appName = Label(self, text=self.appTitle)
-        self.geometry('300x200')
-        # lab1 = Label(self, text="label 1,\navec un saut de ligne")
-        # lab2 = Label(self, text="label 2")
-        # lab3 = Label(self, text="label 3, sans saut de ligne")
-        # lab4 = Label(self, text="label 4")
-        # lab5 = Label(self, text="Le dernier label : le label 5\nAvec un saut de ligne")
-        # lab1.grid(row=0, column=0, sticky='W')
-        # lab2.grid(row=0, column=1, sticky='E')
-        # lab3.grid(row=1, column=0, sticky='E')
-        # lab4.grid(row=1, column=1, sticky='W')
-        # lab5.grid(row=2, columnspan=2)
+        self.geometry('500x400')
+
         activeFont = tkF.Font()
         activeFamily = activeFont.actual('family')
         activeWeight = activeFont.actual('weight')
@@ -44,42 +34,71 @@ class HelpWindow (Tk):
         # print(f'1.{activeFamily}, {activeSize}, {activeWeight}')
         # print(f'2.{activeBoldFamily}, {activeBoldSize}, {activeBoldWeight}')
 
+        appName = Label(self, text=self.appTitle)
         appName['font'] = activeBoldFont
-        appName['background'] = 'yellow'
-        # print(appName.config())
-        fullName = Label(self, text="Yet Another Remote\nCOnnexion Manager")
-        fullName['background'] = 'white'
-        text = Label(self, text="Bla bla bla bla bla bla bla bla bla\nbla bla bla bla bla bla bla.", justify='left')
-        text['background'] = 'coral'
-        aboutText = Text(self)
-        aboutText.tag_configure('bold', font=activeBoldFont)
-        aboutText.tag_configure('normal', font=activeFont)
 
-        aboutContent = "Yet Another Remote Connexion Manager"
-        for word in aboutContent.split():
+        description = (
+            'YARCoM is an application that loads one or many description files of your network (hostnames and IPs) '
+            'as an ordered tree. Then, you can select a machine and run which command you defined from a context '
+            'menu or the default one by double clicking it.'
+            '\nThere are 2 files type :'
+            '\n- YARCoM.conf : containing the configuration'
+            '\n- *.json : files describing your networks.'
+            '\n\nYARCoM.conf is a JSON file containing :'
+            '\n- a list of networks files'
+            '\n- a dictionnary of tools'
+            '\n{\n  \'files\':[\'file1.json\', \'file2.json\'],'
+            '\n  \'tools\': {\n    \'1\': {\n      \'name\':<name1>,\n      \'bin\': <first executable\'s binary path>,\n      \'args\': <arguments>'
+            '\n    }'
+            '\n    \'2\': {\n      \'name\':<name2>,\n      \'bin\': <second executable\'s binary path>,\n      \'args\': <arguments>'
+            '\n    }'
+            '\n  }'
+            '\n}'
+            '\n\nJSONs contains :'
+            '\n- dictionnaries'
+            '\n- a list'
+            '\n{\n  \'NETWORK1\': {\n    \'MACHINE1\': {\'IP\':<IP>}\n    \'MACHINE2\': {\'IP\':<IP>}\n  }\n'
+            '\n  \'NETWORK2\': {\n    \'MACHINE1\': {\'IP\':<IP>}\n    \'MACHINE2\': {\'IP\':<IP>}\n  }'
+            '\n  \'ORDER\':[\'NETWORK2\', \'NETWORK1\']'
+            '\n}'
+            '\nEach dictionnary can also contain nested dictionnaries containing sub-networks of machines. '
+            'Each sub-network must have its own ORDER list. Lists at the same level will be merged.'
+            )
+        text = Text(self)
+        text.tag_configure('bold', font=activeBoldFont)
+        text.tag_configure('normal', font=activeFont)
+        text.insert(END, description, 'normal')
+        text.configure(height=19, spacing3=2, relief=FLAT, state='disabled')
+
+        helpText = Text(self)
+        helpText.tag_configure('bold', font=activeBoldFont)
+        helpText.tag_configure('normal', font=activeFont)
+
+        helpContent = "Yet Another Remote Connexion Manager"
+        for word in helpContent.split():
             for index in range(0, len(word)):
                 if index == 0:
-                    aboutText.insert(END, word[index], 'bold')
+                    helpText.insert(END, word[index], 'bold')
                 else:
                     if word == 'Connexion' and index == 1:
-                        aboutText.insert(END, word[index], 'bold')
+                        helpText.insert(END, word[index], 'bold')
                     else:
-                        aboutText.insert(END, word[index], 'normal')
-            aboutText.insert(END, ' ', 'normal')
-        aboutText.configure(background='pink1', height=1, spacing3=2, relief=FLAT, state='disabled')
-        print(aboutText.config())
+                        helpText.insert(END, word[index], 'normal')
+            helpText.insert(END, ' ', 'normal')
+        helpText.configure(height=1, spacing3=2, relief=FLAT, state='disabled')
+        # print(aboutText.config())
 
         appName.grid(row=0, sticky='WE')
         # fullName.grid(row=1)
-        aboutText.grid(row=1)
-        text.grid(row=2)
+        helpText.grid(row=1, sticky='WE')
+        text.grid(row=2,sticky='WE')
         self.grid_columnconfigure(0, weight=1)
 
-        self.resizable(FALSE, FALSE)
+        # self.resizable(FALSE, FALSE)
 
 
 if __name__ == "__main__":
-    windowTitle = "About..."
+    windowTitle = "Help..."
     appName = "YARCoM v0.1"
     helpWindow = HelpWindow(None, windowTitle, appName)
     helpWindow.mainloop()
