@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+VOIP.json
+https_requests.py
