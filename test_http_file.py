@@ -53,5 +53,15 @@ openURL(urls, False)
 myDict = openFile(file)
 print(f'{json.dumps(myDict, indent=4)}')
 
-# for f in files:
-#     print(f'{f}')
+for f in files:
+    print(f'{f}')
+    files = list()
+    urls = list()
+    if re.match(r'http',f[0]):
+        print(f'{f}')
+
+    # if Path(f).is_file():
+    #     files.append(f)
+    # p = urlparse(f)
+    # if p.scheme() == 'http':
+    #     urls.append()
