@@ -1,0 +1,28 @@
+{
+  "ORDER": [
+    "T3G",
+    "MUZTC"
+  ],
+  "T3G": {
+    "PVCAE761": {
+      "IP": "10.5.202.180",
+      "fonction": "ASBC",
+      "reseau": "RESEAU VOIP",
+      "ville": "Caen",
+      "modele": "APNETNET6300",
+      "PFS": "T3G",
+      "constructeur": "ACMEPACKET"
+    }
+  },
+  "MUZTC": {
+    "MUZTC728": {
+      "IP": "193.252.147.145",
+      "fonction": "SONDE",
+      "reseau": "RESEAU ZTC",
+      "ville": "RENNES",
+      "modele": "X3550",
+      "PFS": "MUZTC",
+      "constructeur": "IBM"
+    }
+  }
+}

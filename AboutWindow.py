@@ -31,13 +31,11 @@ class AboutWindow (Tk):
         else:
             activeFont.configure(weight='normal')
             activeWeight = activeFont.actual('weight')
-        # print(f'1.{activeFamily}, {activeSize}, {activeWeight}')
-        # print(f'2.{activeBoldFamily}, {activeBoldSize}, {activeBoldWeight}')
 
         appName = Label(self, text=self.appTitle, justify='left')
         appName['font'] = activeBoldFont
 
-        aboutContent = 'from faro'
+        aboutContent = 'by faro'
         aboutText = Label(self, text=aboutContent, justify='right')
 
         appName.grid(row=0, sticky='W')

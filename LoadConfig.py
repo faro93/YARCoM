@@ -2,9 +2,8 @@
 # coding=utf-8
 
 from pathlib import *
-import json
-import os
-import subprocess
+from urllib.parse import urlparse
+import json, os, subprocess, logging, requests
 
 class LoadConfig ():
     def __init__(self, file):
@@ -47,6 +46,12 @@ class LoadConfig ():
                     print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
                     del (tools[tool])
         return tools
+    
+    def confTools(self, myDict):
+        pass
+
+    def confEquipmentsFiles(self, myList):
+        pass
 
 if __name__ == "__main__":
     conf = LoadConfig('YARCoM.conf')

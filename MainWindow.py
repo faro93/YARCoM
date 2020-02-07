@@ -15,6 +15,7 @@ class MainWindow (Tk):
         Tk.__init__(self, parent)
         self.parent = parent
         self.title(windowTitle)
+        self.windowTitle = windowTitle
 
     def InitWidgets(self, equipmentList, toolsList):
         self.toolList = toolsList
@@ -77,12 +78,12 @@ class MainWindow (Tk):
 
     def Help(self):
         helpWindowTitle = "Help..."
-        # print ("Help menu "+ helpWindowTitle+' '+windowTitle)
-        helpWindow = HelpWindow(None, helpWindowTitle, windowTitle)
+        print ("Help menu "+ helpWindowTitle+' '+self.windowTitle)
+        helpWindow = HelpWindow(None, helpWindowTitle, self.windowTitle)
 
     def About(self):
         aboutWindowTitle = "About..."
-        aboutWindow = AboutWindow(None, aboutWindowTitle, windowTitle)
+        aboutWindow = AboutWindow(None, aboutWindowTitle, self.windowTitle)
 
     def InitContextMenuWidget(self):
         self.popupMenu = Menu(self, tearoff=0)
