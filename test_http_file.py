@@ -1,41 +1,38 @@
 from pathlib import *
-import logging, requests, os, json, sys
+import logging, requests, os, json, sys, re
 from urllib.parse import urlparse
 
 # Prevent InsecureRequestWarning message from being displayed
 logging.captureWarnings(True)
 
-def openURL (myList, proxy=True):
-    root = dict()
-    mystring = ''
-    for url in range(len(myList)):
-        p = urlparse(myList[url])
-        mystring += p.netloc
-        print(f'{mystring}')
-        if url < len(myList)-1:
-            mystring += ';'
+def openURL (file, proxy=True):
+    tree = dict()
+    mystring = str()
+    p = urlparse(file)
+    mystring += p.netloc
 
     if proxy == False:
-        os.environ['NO_PROXY'] = mystring
-
-    for url in urls:
-        r = requests.get(url, verify=False)
-        rep = r.text.splitlines()
-        for l in rep:
-            print(f'{l}')
-
-def openFile (myList):
-    root = dict()
-    order = list()
-    for file in myList:
-        if Path(file).is_file():
-            with open(file) as fp:
-                tree = json.load(fp)
-                order = MergeDict(root, tree, order)
-                fp.close()
+        if not 'NO_PROXY' in os.environ:
+            os.environ['NO_PROXY'] = mystring
         else:
-            print("No configuration loaded.")
-    return root
+            os.environ['NO_PROXY'] += ';' + mystring
+
+    r = requests.get(file, verify=False)
+    if r.reason == 'OK':
+        tree = json.loads(r.content)
+        return tree
+    else:
+        print(f'Unable to get response from {file}')
+
+def openLocal (file):
+    tree = dict()
+    if Path(file).is_file():
+        with open(file) as fp:
+            tree = json.load(fp)
+            fp.close()
+    else:
+        print("No configuration loaded.")
+    return tree
 
 def MergeDict(dict1, dict2, order):
         for index in dict2['ORDER']:
@@ -44,24 +41,28 @@ def MergeDict(dict1, dict2, order):
         dict1['ORDER'] = order
         return order
 
-files=[['VOIP_mini.json',False],
-    ['https://193.252.147.147/YARCoM/BBC_VOIP_mini.json', False]]
+files=[
+    ['VOIP_mini.json', False],
+    ['https://193.252.147.147/YARCoM/BBC_VOIP_mini.json', False],
+    ['other1.json', False]]
 
-urls=['https://193.252.147.147/YARCoM/BBC_VOIP_mini.json']
-file=['VOIP_mini.json']
-openURL(urls, False)
-myDict = openFile(file)
-print(f'{json.dumps(myDict, indent=4)}')
+root = dict()
+order = list()
+for file in files:
+    tree = dict()
+    print(f'{file}')
+    if re.match(r'http',file[0]):
+        # print(f'{file[0]} est un fichier distant')
+        tree = openURL(file[0], file[1])
+        # print(f'{json.dumps(tree, indent=4)}')
+    else:
+        # print(f'{file[0]} est un fichier local')
+        tree = openLocal(file[0])
+        # print(f'{json.dumps(tree, indent=4)}')
+    if 'ORDER' in tree:
+        order = MergeDict(root, tree, order)
+    else:
+        print("tree has no key 'ORDER'")
 
-for f in files:
-    print(f'{f}')
-    files = list()
-    urls = list()
-    if re.match(r'http',f[0]):
-        print(f'{f}')
-
-    # if Path(f).is_file():
-    #     files.append(f)
-    # p = urlparse(f)
-    # if p.scheme() == 'http':
-    #     urls.append()
+print("## root:")
+print(f'{json.dumps(root, indent=4)}')
