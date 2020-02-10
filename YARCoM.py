@@ -13,11 +13,13 @@ class YARCoM():
         self.appName = "YARCoM"
         self.appVersion = "v0.1"
         self.appAuthor = "faro"
+        self.windowTitle = self.getTitle()
+        self.mainWindow = MainWindow(None, self.windowTitle)
         self.config = LoadConfig(self.confFile)
         self.equipmentsList = self.config.LoadEquipments()
         toolsList = self.config.getTools()
-        self.windowTitle = self.getTitle()
-        self.mainWindow = MainWindow(None, self.windowTitle)
+        # self.windowTitle = self.getTitle()
+        # self.mainWindow = MainWindow(None, self.windowTitle)
         self.mainWindow.InitWidgets(self.equipmentsList, toolsList)
         self.mainWindow.mainloop()
 

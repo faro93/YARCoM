@@ -17,12 +17,22 @@ def openURL (file, proxy=True):
         else:
             os.environ['NO_PROXY'] += ';' + mystring
 
-    r = requests.get(file, verify=False)
+    try:
+        r = requests.get(file, verify=False)
+    except requests.exceptions.ConnectionError as ce:
+        print(f'1.Unable to get response from {file} : {ce}')
+        tree['ORDER'] = dict()
+        return tree
+    except requests.exceptions.ConnectionRefusedError as cre:
+        print(f'2.Unable to get response from {file} : {cre}')
+        tree['ORDER'] = dict()
+        return tree
+
     if r.reason == 'OK':
         tree = json.loads(r.content)
         return tree
-    else:
-        print(f'Unable to get response from {file}')
+    # else:
+    #     print(f'Unable to get response from {file}')
 
 def openLocal (file):
     tree = dict()
