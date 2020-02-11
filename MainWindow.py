@@ -6,6 +6,8 @@ from tkinter import ttk     # pylint disable=unused-wildcard-import
 from LoadConfig import LoadConfig
 from HelpWindow import HelpWindow
 from AboutWindow import AboutWindow
+from FilesWindow import FilesWindow
+from ToolsWindow import ToolsWindow
 import subprocess
 # import shlex
 
@@ -63,18 +65,27 @@ class MainWindow (Tk):
 
     def InitMenuWidget(self):
         self.menuBar = Menu(self)
-        self.fileMenu = Menu(self.menuBar, tearoff=0)
-        self.fileMenu.add_command(label="Configure")
-        self.fileMenu.add_separator()
+        self.configMenu = Menu(self.menuBar, tearoff=0)
+        self.configMenu.add_command(label="Tools", command=self.Tools)
+        self.configMenu.add_command(label="Files", command=self.Files)
+        self.configMenu.add_separator()
         self.config(menu=self.menuBar)
-        self.fileMenu.add_command(label="Exit", command=self.quit)
-        self.menuBar.add_cascade(label="File", menu=self.fileMenu)
+        self.configMenu.add_command(label="Exit", command=self.quit)
+        self.menuBar.add_cascade(label="Configure", menu=self.configMenu)
 
         self.helpMenu = Menu(self.menuBar, tearoff=0)
         self.helpMenu.add_command(label="Help...", command=self.Help)
         self.helpMenu.add_separator()
         self.helpMenu.add_command(label="About...", command=self.About)
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
+
+    def Tools(self):
+        toolsWindowTitle = "Tools ..."
+        toolsWindow = ToolsWindow(None, toolsWindowTitle, self.windowTitle)
+
+    def Files(self):
+        filesWindowTitle = "Files ..."
+        filesWindow = FilesWindow(None, filesWindowTitle, self.windowTitle)
 
     def Help(self):
         helpWindowTitle = "Help..."
@@ -209,10 +220,10 @@ class MainWindow (Tk):
 
 
 if __name__ == "__main__":
-    config = LoadConfig('YARCoM.conf')
-    equipmentList = config.LoadEquipments()
     windowTitle = "YARCoM v0.1"
-    toolsList = config.getTools()
+    config = LoadConfig('YARCoM.conf')
     mainWindow = MainWindow(None, windowTitle)
+    equipmentList = config.LoadEquipments()
+    toolsList = config.getTools()
     mainWindow.InitWidgets(equipmentList, toolsList)
     mainWindow.mainloop()

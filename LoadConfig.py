@@ -26,7 +26,6 @@ class LoadConfig ():
         order = list()
         for file in self.configuration['files']:
             tree = dict()
-            print(f'{file}')
             if re.match(r'http',file[0]):
                 tree = self.openURL(file[0], file[1])
             else:
@@ -34,7 +33,7 @@ class LoadConfig ():
             if 'ORDER' in tree:
                 order = self.MergeDict(root, tree, order)
             else:
-                print("tree has no key 'ORDER'")
+                messagebox.showwarning("YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
         return root
 
     def openURL (self, file, proxy=True):
@@ -52,12 +51,11 @@ class LoadConfig ():
         try:
             r = requests.get(file, verify=False)
         except requests.exceptions.ConnectionError as ce:
-            print(f'1.Unable to get {file} : {ce}')
-            messagebox.showwarning("Unable to load file "+file, ce)
+            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file)+"\n"+str(ce))
             tree['ORDER'] = dict()
             return tree
         except requests.exceptions.ConnectionRefusedError as cre:
-            print(f'2.Unable to get {file} : {cre}')
+            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file)+"\n"+str(cre))
             tree['ORDER'] = dict()
             return tree
 
@@ -72,7 +70,7 @@ class LoadConfig ():
                 tree = json.load(fp)
                 fp.close()
         else:
-            print("No configuration loaded.")
+            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file))
         return tree
 
     def MergeDict(self, dict1, dict2, order):
@@ -87,7 +85,9 @@ class LoadConfig ():
             tools = self.configuration['tools']
             for tool in sorted(tools):
                 if not os.path.exists(tools[tool]['bin']):
-                    print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
+                    # print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
+                    messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tools[tool]['name'])+
+                        " :\ndoes not exist")
                     del (tools[tool])
         return tools
     

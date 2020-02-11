@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 # Prevent InsecureRequestWarning message from being displayed
 logging.captureWarnings(True)
 
+
 def openURL (file, proxy=True):
     tree = dict()
     mystring = str()

@@ -17,10 +17,8 @@ class YARCoM():
         self.mainWindow = MainWindow(None, self.windowTitle)
         self.config = LoadConfig(self.confFile)
         self.equipmentsList = self.config.LoadEquipments()
-        toolsList = self.config.getTools()
-        # self.windowTitle = self.getTitle()
-        # self.mainWindow = MainWindow(None, self.windowTitle)
-        self.mainWindow.InitWidgets(self.equipmentsList, toolsList)
+        self.toolsList = self.config.getTools()
+        self.mainWindow.InitWidgets(self.equipmentsList, self.toolsList)
         self.mainWindow.mainloop()
 
     def getTitle(self):
