@@ -130,3 +130,4 @@ dmypy.json
 VOIP.json
 https_requests.py
 test_http_file.py
+.vscode/settings.json

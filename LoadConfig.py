@@ -3,8 +3,15 @@
 
 from pathlib import *
 from urllib.parse import urlparse
-import json, os, subprocess, logging, requests, sys, re
+import json
+import os
+import subprocess
+import logging
+import requests
+import sys
+import re
 from tkinter import messagebox
+
 
 class LoadConfig ():
     def __init__(self, file):
@@ -26,17 +33,18 @@ class LoadConfig ():
         order = list()
         for file in self.configuration['files']:
             tree = dict()
-            if re.match(r'http',file[0]):
+            if re.match(r'http', file[0]):
                 tree = self.openURL(file[0], file[1])
             else:
                 tree = self.openLocal(file[0])
             if 'ORDER' in tree:
                 order = self.MergeDict(root, tree, order)
             else:
-                messagebox.showwarning("YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
+                messagebox.showwarning(
+                    "YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
         return root
 
-    def openURL (self, file, proxy=True):
+    def openURL(self, file, proxy=True):
         tree = dict()
         mystring = str()
         p = urlparse(file)
@@ -51,11 +59,13 @@ class LoadConfig ():
         try:
             r = requests.get(file, verify=False)
         except requests.exceptions.ConnectionError as ce:
-            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file)+"\n"+str(ce))
+            messagebox.showwarning(
+                "YARCoM warning", "Unable to load file "+str(file)+"\n"+str(ce))
             tree['ORDER'] = dict()
             return tree
         except requests.exceptions.ConnectionRefusedError as cre:
-            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file)+"\n"+str(cre))
+            messagebox.showwarning(
+                "YARCoM warning", "Unable to load file "+str(file)+"\n"+str(cre))
             tree['ORDER'] = dict()
             return tree
 
@@ -63,14 +73,15 @@ class LoadConfig ():
             tree = json.loads(r.content)
             return tree
 
-    def openLocal (self, file):
+    def openLocal(self, file):
         tree = dict()
         if Path(file).is_file():
             with open(file) as fp:
                 tree = json.load(fp)
                 fp.close()
         else:
-            messagebox.showwarning("YARCoM warning", "Unable to load file "+str(file))
+            messagebox.showwarning(
+                "YARCoM warning", "Unable to load file "+str(file))
         return tree
 
     def MergeDict(self, dict1, dict2, order):
@@ -86,16 +97,17 @@ class LoadConfig ():
             for tool in sorted(tools):
                 if not os.path.exists(tools[tool]['bin']):
                     # print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
-                    messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tools[tool]['name'])+
-                        " :\ndoes not exist")
+                    messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tools[tool]['name']) +
+                                           " :\ndoes not exist")
                     del (tools[tool])
         return tools
-    
+
     def confTools(self, myDict):
         pass
 
     def confEquipmentsFiles(self, myList):
         pass
+
 
 if __name__ == "__main__":
     conf = LoadConfig('YARCoM.conf')
