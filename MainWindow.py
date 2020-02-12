@@ -89,7 +89,7 @@ class MainWindow (Tk):
 
     def Help(self):
         helpWindowTitle = "Help..."
-        print ("Help menu "+ helpWindowTitle+' '+self.windowTitle)
+        print("Help menu " + helpWindowTitle+' '+self.windowTitle)
         helpWindow = HelpWindow(None, helpWindowTitle, self.windowTitle)
 
     def About(self):
@@ -114,7 +114,8 @@ class MainWindow (Tk):
                 if (tool['args'] == ''):
                     subprocess.Popen([tool['bin'], ip], shell=True)
                 else:
-                    subprocess.Popen([tool['bin'], tool['args'], ip], shell=True)
+                    subprocess.Popen(
+                        [tool['bin'], tool['args'], ip], shell=True)
             else:
                 print("Not only one IP in list !")
 
@@ -181,9 +182,9 @@ class MainWindow (Tk):
     def TreeOnDoubleClick(self, event):
         self.RunToolFromTree()
 
-    def RunToolFromTree (self):
+    def RunToolFromTree(self):
         defaultTool = self.toolList["1"]
-        print (defaultTool)
+        print(defaultTool)
         for item in self.tree.selection():
             item_text = self.tree.item(item, "text")
             item_value = self.tree.item(item, "value")
@@ -194,12 +195,13 @@ class MainWindow (Tk):
                     if (defaultTool['args'] == ''):
                         subprocess.Popen([defaultTool['bin'], ip], shell=True)
                     else:
-                        subprocess.Popen([defaultTool['bin'], defaultTool['args'], ip], shell=True)
+                        subprocess.Popen(
+                            [defaultTool['bin'], defaultTool['args'], ip], shell=True)
             else:
                 self.tree.selection_remove(item)
 
     def TreeOnRightClick(self, event):
-        self.PopUp (event)
+        self.PopUp(event)
 
     def EntryOnPressReturn(self, event):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
