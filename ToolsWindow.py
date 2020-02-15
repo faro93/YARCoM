@@ -3,6 +3,7 @@
 
 from tkinter import *       # pylint disable=unused-wildcard-import
 from tkinter import ttk     # pylint disable=unused-wildcard-import
+from tkinter import PhotoImage     # pylint disable=unused-wildcard-import
 from LoadConfig import LoadConfig
 import json
 
@@ -15,7 +16,7 @@ class ToolsWindow (Tk):
         self.appTitle = appName
         self.InitWindow(self.parent)
         self.grid()
-        self.minsize(600,400)
+        self.minsize(600, 400)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -52,24 +53,25 @@ class ToolsWindow (Tk):
         self.buttonsFrame = ttk.Frame(parent, width=100, height=100, padding=5)
         self.buttonsFrame.grid(column=1, row=0)
 
-        top = Button(self.buttonsFrame, text="Top",
-                     command=lambda arg=("tool top"): self.test(arg))
-        top.grid(row=0, sticky=(E, W))
-        up = Button(self.buttonsFrame, text="Up",
-                    command=lambda arg=("tool up"): self.test(arg))
-        up.grid(row=1, sticky=(E, W))
-        adding = Button(self.buttonsFrame, text="Add",
-                        command=lambda arg=("tool add"): self.test(arg))
-        adding.grid(row=2, sticky=(E, W))
-        deleting = Button(self.buttonsFrame, text="Del",
-                          command=lambda arg=("tool del"): self.test(arg))
-        deleting.grid(row=3, sticky=(E, W))
-        down = Button(self.buttonsFrame, text="Down",
-                      command=lambda arg=("tool down"): self.test(arg))
-        down.grid(row=4, sticky=(E, W))
-        bottom = Button(self.buttonsFrame, text="Bottom",
-                        command=lambda arg=("tool bottom"): self.test(arg))
-        bottom.grid(row=5, sticky=(E, W))
+        self.pToolsTop = PhotoImage(file="icon_top.png")
+        self.pToolsUp = PhotoImage(file="icon_up.png")
+        self.pToolsAdd = PhotoImage(file="icon_toolbox.png")
+        self.pToolsDel = PhotoImage(file="icon_trash.png")
+        self.pToolsDown = PhotoImage(file="icon_down.png")
+        self.pToolsBottom = PhotoImage(file="icon_bottom.png")
+
+        self.top = Button(self.buttonsFrame, text="Top", image=self.pToolsTop, command=lambda arg=(
+            "tool top"): self.test(arg)).grid(row=0, sticky=(E, W))
+        self.up = Button(self.buttonsFrame, text="Up", image=self.pToolsUp, command=lambda arg=(
+            "tool up"): self.test(arg)).grid(row=1, sticky=(E, W))
+        self.adding = Button(self.buttonsFrame, text="Add", image=self.pToolsAdd, command=lambda arg=(
+            "tool add"): self.test(arg), width=4).grid(row=2, sticky=(E, W))
+        self.deleting = Button(self.buttonsFrame, text="Del", image=self.pToolsDel, command=lambda arg=(
+            "tool del"): self.test(arg), width=4).grid(row=3, sticky=(E, W))
+        self.down = Button(self.buttonsFrame, text="Down", image=self.pToolsDown, command=lambda arg=(
+            "tool down"): self.test(arg), width=4).grid(row=4, sticky=(E, W))
+        self.bottom = Button(self.buttonsFrame, text="Bottom", image=self.pToolsBottom, command=lambda arg=(
+            "tool bottom"): self.test(arg), width=4).grid(row=5, sticky=(E, W))
 
     def InitFiles(self, parent):
         self.tree = ttk.Treeview(parent)
@@ -86,28 +88,28 @@ class ToolsWindow (Tk):
         self.buttonsFrame = ttk.Frame(parent, width=100, height=100, padding=5)
         self.buttonsFrame.grid(column=1, row=0)
 
-        top = Button(self.buttonsFrame, text="Top",
-                     command=lambda arg=("file top"): self.test(arg))
-        top.grid(row=0, sticky=(E, W))
-        up = Button(self.buttonsFrame, text="Up",
-                    command=lambda arg=("file up"): self.test(arg))
-        up.grid(row=1, sticky=(E, W))
-        addurl = Button(self.buttonsFrame, text="Add URL",
-                        command=lambda arg=("file add URL"): self.test(arg))
-        addurl.grid(row=2, sticky=(E, W))
-        addfile = Button(self.buttonsFrame, text="Add Local",
-                          command=lambda arg=("file add local"): self.test(arg))
-        addfile.grid(row=3, sticky=(E, W))
-        deleting = Button(self.buttonsFrame, text="Del",
-                          command=lambda arg=("file del"): self.test(arg))
-        deleting.grid(row=4, sticky=(E, W))
+        self.pFilesTop = PhotoImage(file="icon_top.png")
+        self.pFilesUp = PhotoImage(file="icon_up.png")
+        self.pFilesAddL = PhotoImage(file="icon_addlink.png")
+        self.pFilesAddF = PhotoImage(file="icon_addfile.png")
+        self.pFilesDel = PhotoImage(file="icon_trash.png")
+        self.pFilesDown = PhotoImage(file="icon_down.png")
+        self.pFilesBottom = PhotoImage(file="icon_bottom.png")
 
-        down = Button(self.buttonsFrame, text="Down",
-                      command=lambda arg=("file down"): self.test(arg))
-        down.grid(row=5, sticky=(E, W))
-        bottom = Button(self.buttonsFrame, text="Bottom",
-                        command=lambda arg=("file bottom"): self.test(arg))
-        bottom.grid(row=6, sticky=(E, W))
+        self.top = Button(self.buttonsFrame, text="Top", image=self.pFilesTop, command=lambda arg=(
+            "file top"): self.test(arg)).grid(row=0, sticky=(E, W))
+        up = Button(self.buttonsFrame, text="Up", image=self.pFilesUp, command=lambda arg=(
+            "file up"): self.test(arg)).grid(row=1, sticky=(E, W))
+        addurl = Button(self.buttonsFrame, text="Add URL", image=self.pFilesAddL, command=lambda arg=(
+            "file add URL"): self.test(arg)).grid(row=2, sticky=(E, W))
+        addfile = Button(self.buttonsFrame, text="Add Local", image=self.pFilesAddF, command=lambda arg=(
+            "file add local"): self.test(arg)).grid(row=3, sticky=(E, W))
+        deleting = Button(self.buttonsFrame, text="Del", image=self.pFilesDel, command=lambda arg=(
+            "file del"): self.test(arg)).grid(row=4, sticky=(E, W))
+        down = Button(self.buttonsFrame, text="Down", image=self.pFilesDown, command=lambda arg=(
+            "file down"): self.test(arg)).grid(row=5, sticky=(E, W))
+        bottom = Button(self.buttonsFrame, text="Bottom", image=self.pFilesBottom, command=lambda arg=(
+            "file bottom"): self.test(arg)).grid(row=6, sticky=(E, W))
 
     def test(self, arg):
         print(f'You clicked button "{arg}"')
