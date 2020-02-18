@@ -3,13 +3,7 @@
 
 from pathlib import *
 from urllib.parse import urlparse
-import json
-import os
-import subprocess
-import logging
-import requests
-import sys
-import re
+import json, os, subprocess, logging, requests, sys, re
 from tkinter import messagebox
 
 
@@ -102,11 +96,11 @@ class LoadConfig ():
                     del (tools[tool])
         return tools
 
-    def confTools(self, myDict):
-        pass
+    # def confTools(self, myDict):
+    #     pass
 
-    def confEquipmentsFiles(self, myList):
-        pass
+    # def confEquipmentsFiles(self, myList):
+    #     pass
 
 
 if __name__ == "__main__":
