@@ -61,17 +61,17 @@ class ToolsWindow (Tk):
         self.pToolsBottom = PhotoImage(file="icon_bottom.png")
 
         self.top = Button(self.buttonsFrame, text="Top", image=self.pToolsTop, command=lambda arg=(
-            "tool top"): self.test(arg)).grid(row=0, sticky=(E, W))
+            "tool top"): self.OnButtonClick(arg)).grid(row=0, sticky=(E, W))
         self.up = Button(self.buttonsFrame, text="Up", image=self.pToolsUp, command=lambda arg=(
-            "tool up"): self.test(arg)).grid(row=1, sticky=(E, W))
+            "tool up"): self.OnButtonClick(arg)).grid(row=1, sticky=(E, W))
         self.adding = Button(self.buttonsFrame, text="Add", image=self.pToolsAdd, command=lambda arg=(
-            "tool add"): self.test(arg), width=4).grid(row=2, sticky=(E, W))
+            "tool add"): self.OnButtonClick(arg), width=4).grid(row=2, sticky=(E, W))
         self.deleting = Button(self.buttonsFrame, text="Del", image=self.pToolsDel, command=lambda arg=(
-            "tool del"): self.test(arg), width=4).grid(row=3, sticky=(E, W))
+            "tool del"): self.OnButtonClick(arg), width=4).grid(row=3, sticky=(E, W))
         self.down = Button(self.buttonsFrame, text="Down", image=self.pToolsDown, command=lambda arg=(
-            "tool down"): self.test(arg), width=4).grid(row=4, sticky=(E, W))
+            "tool down"): self.OnButtonClick(arg), width=4).grid(row=4, sticky=(E, W))
         self.bottom = Button(self.buttonsFrame, text="Bottom", image=self.pToolsBottom, command=lambda arg=(
-            "tool bottom"): self.test(arg), width=4).grid(row=5, sticky=(E, W))
+            "tool bottom"): self.OnButtonClick(arg), width=4).grid(row=5, sticky=(E, W))
 
     def InitFiles(self, parent):
         self.tree = ttk.Treeview(parent)
@@ -97,23 +97,24 @@ class ToolsWindow (Tk):
         self.pFilesBottom = PhotoImage(file="icon_bottom.png")
 
         self.top = Button(self.buttonsFrame, text="Top", image=self.pFilesTop, command=lambda arg=(
-            "file top"): self.test(arg)).grid(row=0, sticky=(E, W))
+            "file top"): self.OnButtonClick(arg)).grid(row=0, sticky=(E, W))
         up = Button(self.buttonsFrame, text="Up", image=self.pFilesUp, command=lambda arg=(
-            "file up"): self.test(arg)).grid(row=1, sticky=(E, W))
+            "file up"): self.OnButtonClick(arg)).grid(row=1, sticky=(E, W))
         addurl = Button(self.buttonsFrame, text="Add URL", image=self.pFilesAddL, command=lambda arg=(
-            "file add URL"): self.test(arg)).grid(row=2, sticky=(E, W))
+            "file add URL"): self.OnButtonClick(arg)).grid(row=2, sticky=(E, W))
         addfile = Button(self.buttonsFrame, text="Add Local", image=self.pFilesAddF, command=lambda arg=(
-            "file add local"): self.test(arg)).grid(row=3, sticky=(E, W))
+            "file add local"): self.OnButtonClick(arg)).grid(row=3, sticky=(E, W))
         deleting = Button(self.buttonsFrame, text="Del", image=self.pFilesDel, command=lambda arg=(
-            "file del"): self.test(arg)).grid(row=4, sticky=(E, W))
+            "file del"): self.OnButtonClick(arg)).grid(row=4, sticky=(E, W))
         down = Button(self.buttonsFrame, text="Down", image=self.pFilesDown, command=lambda arg=(
-            "file down"): self.test(arg)).grid(row=5, sticky=(E, W))
+            "file down"): self.OnButtonClick(arg)).grid(row=5, sticky=(E, W))
         bottom = Button(self.buttonsFrame, text="Bottom", image=self.pFilesBottom, command=lambda arg=(
-            "file bottom"): self.test(arg)).grid(row=6, sticky=(E, W))
+            "file bottom"): self.OnButtonClick(arg)).grid(row=6, sticky=(E, W))
 
-    def test(self, arg):
+
+
+    def OnButtonClick(self, arg):
         print(f'You clicked button "{arg}"')
-
 
 if __name__ == "__main__":
     windowTitle = "Tools ..."
@@ -123,5 +124,5 @@ if __name__ == "__main__":
     equipmentList = config.LoadEquipments()
     toolsList = config.getTools()
     toolsWindow.mainloop()
-    # print(f'{json.dumps(equipmentList, indent=4)}')
-    # print(f'{json.dumps(toolsList, indent=4)}')
+    print(f'{json.dumps(equipmentList, indent=4)}')
+    print(f'{json.dumps(toolsList, indent=4)}')
