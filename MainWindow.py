@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 # coding=utf-8
 
-from tkinter import *       # pylint disable=unused-wildcard-import
-from tkinter import ttk     # pylint disable=unused-wildcard-import
+from tkinter import *
+from tkinter import ttk
 from LoadConfig import LoadConfig
 from HelpWindow import HelpWindow
 from AboutWindow import AboutWindow
-from FilesWindow import FilesWindow
-from ToolsWindow import ToolsWindow
+# from FilesWindow import FilesWindow
+from PrefsWindow import PrefsWindow
 import subprocess
 # import shlex
 
@@ -24,14 +24,14 @@ class MainWindow (Tk):
         self.equipmentList = equipmentList
         self.grid()
         self.InitTreeWidget()
-        self.InitEntryWidget()
-        self.InitButtonWidget()
+        # self.InitEntryWidget()
+        # self.InitButtonWidget()
         self.InitMenuWidget()
         self.InitContextMenuWidget()
 
         self.tree.grid(row=0, column=0, columnspan=2, sticky='NS')
-        self.entry.grid(row=1, column=0, sticky='EW')
-        self.button.grid(row=1, column=1, sticky='EW')
+        # self.entry.grid(row=1, column=0, sticky='EW')
+        # self.button.grid(row=1, column=1, sticky='EW')
         self.grid_rowconfigure(0, weight=1)
         self.resizable(FALSE, TRUE)
 
@@ -66,8 +66,7 @@ class MainWindow (Tk):
     def InitMenuWidget(self):
         self.menuBar = Menu(self)
         self.configMenu = Menu(self.menuBar, tearoff=0)
-        self.configMenu.add_command(label="Tools", command=self.Tools)
-        self.configMenu.add_command(label="Files", command=self.Files)
+        self.configMenu.add_command(label="Preferences", command=self.Prefs)
         self.configMenu.add_separator()
         self.config(menu=self.menuBar)
         self.configMenu.add_command(label="Exit", command=self.quit)
@@ -79,13 +78,9 @@ class MainWindow (Tk):
         self.helpMenu.add_command(label="About...", command=self.About)
         self.menuBar.add_cascade(label="Help", menu=self.helpMenu)
 
-    def Tools(self):
-        toolsWindowTitle = "Tools ..."
-        toolsWindow = ToolsWindow(None, toolsWindowTitle, self.windowTitle)
-
-    def Files(self):
-        filesWindowTitle = "Files ..."
-        filesWindow = FilesWindow(None, filesWindowTitle, self.windowTitle)
+    def Prefs(self):
+        prefsWindowTitle = "Preferences ..."
+        prefsWindow = PrefsWindow(None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
 
     def Help(self):
         helpWindowTitle = "Help..."
@@ -100,22 +95,23 @@ class MainWindow (Tk):
         self.popupMenu = Menu(self, tearoff=0)
         # print(toolsList)
         for tool in sorted(self.toolList):
-            self.popupMenu.add_command(label=str(tool) + '.' + self.toolList[tool]['name'],
-                                       command=lambda arg=(self.toolList[tool]): self.RunToolFromContextMenu(arg))
+            self.popupMenu.add_command(label=tool[0],
+                                       command=lambda arg=(tool): self.RunToolFromContextMenu(arg))
 
     def RunToolFromContextMenu(self, tool):
+        # print(f'tool={tool}')
         item = self.popupMenu.selection
         if self.tree.exists(item):
             # print(f"{item}")
-            # self.tree.selection_set(item)
-            print("item: {}, tool= {}".format(self.tree.item(item), tool))
+            self.tree.selection_set(item)
+            # print("item: {}, tool= {}".format(self.tree.item(item), tool))
             if len(self.tree.item(item)['values']) != 0:
                 ip = self.tree.item(item)['values'][0]
-                if (tool['args'] == ''):
-                    subprocess.Popen([tool['bin'], ip], shell=True)
+                if (tool[2] == ''):
+                    subprocess.Popen([tool[1], ip], shell=True)
                 else:
                     subprocess.Popen(
-                        [tool['bin'], tool['args'], ip], shell=True)
+                        [tool[1], tool[2], ip], shell=True)
             else:
                 print("Not only one IP in list !")
 
@@ -183,8 +179,8 @@ class MainWindow (Tk):
         self.RunToolFromTree()
 
     def RunToolFromTree(self):
-        defaultTool = self.toolList["1"]
-        print(defaultTool)
+        defaultTool = self.toolList[0]
+        # print(defaultTool)
         for item in self.tree.selection():
             item_text = self.tree.item(item, "text")
             item_value = self.tree.item(item, "value")
@@ -192,11 +188,11 @@ class MainWindow (Tk):
                 for value in item_value:
                     print("TreeOnDoubleClick: {} -> {}".format(item_text, value))
                     ip = value
-                    if (defaultTool['args'] == ''):
-                        subprocess.Popen([defaultTool['bin'], ip], shell=True)
+                    if (defaultTool[2] == ''):
+                        subprocess.Popen([defaultTool[1], ip], shell=True)
                     else:
                         subprocess.Popen(
-                            [defaultTool['bin'], defaultTool['args'], ip], shell=True)
+                            [defaultTool[1], defaultTool[2], ip], shell=True)
             else:
                 self.tree.selection_remove(item)
 

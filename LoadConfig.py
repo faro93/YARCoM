@@ -88,12 +88,12 @@ class LoadConfig ():
     def getTools(self):
         if self.configuration != False:
             tools = self.configuration['tools']
-            for tool in sorted(tools):
-                if not os.path.exists(tools[tool]['bin']):
+            for tool in self.configuration['tools']:
+                if not os.path.exists(tool[1]):
                     # print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
-                    messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tools[tool]['name']) +
+                    messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tool[0]) +
                                            " :\ndoes not exist")
-                    del (tools[tool])
+                    tools.remove(tool)
         return tools
 
     # def confTools(self, myDict):
@@ -107,5 +107,5 @@ if __name__ == "__main__":
     conf = LoadConfig('YARCoM.conf')
     root = conf.LoadEquipments()
     toolList = conf.getTools()
-    print(f'{json.dumps(root, indent=4)}')
-    print(f'{json.dumps(toolList, indent=4)}')
+    # print(f'{json.dumps(root, indent=4)}')
+    # print(f'{json.dumps(toolList, indent=4)}')
