@@ -27,6 +27,8 @@ class PrefsWindow (Tk):
 
         if self.configuration != False:
             print(f'{json.dumps(self.configuration, indent=4)}')
+            self.toolsList = self.configuration['tools']
+            self.filesList = self.configuration['files']
 
         self.parent = parent
         self.title(windowTitle)
@@ -44,17 +46,17 @@ class PrefsWindow (Tk):
         self.configTabs.add(self.toolsFrame, text="Tools")
         self.toolsFrame.columnconfigure(0, weight=1)
         self.toolsFrame.rowconfigure(0, weight=1)
-        self.InitTools(self.toolsFrame, configuration['tools'])
+        self.InitTools(self.toolsFrame)
 
         self.filesFrame = ttk.Frame(self.configTabs, padding=5)
         self.configTabs.add(self.filesFrame, text="Files")
         self.filesFrame.columnconfigure(0, weight=1)
         self.filesFrame.rowconfigure(0, weight=1)
-        self.InitFiles(self.filesFrame, configuration['files'])
+        self.InitFiles(self.filesFrame)
 
         self.configTabs.grid(column=0, row=0, sticky=(N, S, E, W))
 
-    def InitTools(self, parent, toolsList):
+    def InitTools(self, parent):
         self.toolsTree = ttk.Treeview(parent)
         self.toolsTree['columns'] = ('Path')
         self.toolsTree.column('#0', width=50, stretch=TRUE, anchor='w')
@@ -62,10 +64,10 @@ class PrefsWindow (Tk):
         self.toolsTree.column('Path', width=300, stretch=TRUE, anchor='w')
         self.toolsTree.heading('Path', text="Path")
         self.toolsTree.config(selectmode='browse')
-        self.toolsTree.grid(column=0, row=0, sticky=(N, S, E, W))
+        self.toolsTree.grid(column=0, row=0, sticky=(N, S, E, W), columnspan=3)
 
         self.buttonsFrame = ttk.Frame(parent, width=100, height=100, padding=5)
-        self.buttonsFrame.grid(column=1, row=0)
+        self.buttonsFrame.grid(column=4, row=0)
 
         self.pToolsTop = PhotoImage(file="icon_top.png")
         self.pToolsUp = PhotoImage(file="icon_up.png")
@@ -87,78 +89,102 @@ class PrefsWindow (Tk):
         self.bottom = Button(self.buttonsFrame, text="Bottom", image=self.pToolsBottom, command=lambda arg=(
             "tool bottom"): self.OnButtonClick(arg), width=4).grid(row=5, sticky=(E, W))
 
+        self.okFrame = ttk.Frame(parent, padding=5)
+        self.okFrame.grid(column=2, row=1)
+        self.cancelFrame = ttk.Frame(parent, padding=5)
+        self.cancelFrame.grid(column=4, row=1)
+
+        self.ok = Button(self.okFrame, text="OK", command=lambda arg=(
+            "tool OK"): self.OnButtonClick(arg), width=5, padx=4, pady=4).grid(column=0, row=0)
+        self.cancel = Button(self.cancelFrame, text="Cancel", command=lambda arg=(
+            "tool CANCEL"): self.OnButtonClick(arg), width=5, padx=4, pady=4).grid(column=1, row=0)
+
         print(f'Tools:')
-        print(f'{json.dumps(toolsList, indent=4)}')
-        
+        print(f'{json.dumps(self.toolsList, indent=4)}')
+
         if self.configuration != False:
-            for tool in toolsList:
+            for tool in self.toolsList:
                 if not os.path.exists(tool[1]):
                     messagebox.showwarning("YARCoM warning", "Erasing tool "+tool[0] +
                                            " :\ndoes not exist")
-                    toolsList.remove(tool)
-                    # print(f'{json.dumps(toolsList, indent=4)}')
-        if toolsList:
-            for tool in toolsList:
-                # print(f'tool={tool}\nname={tool[0]}, bin={tool[1]}, args={tool[2]}')
-                self.toolsTree.insert('', 'end', tool[0], text=tool[0], values=[tool[1], tool[2]])
+                    self.toolsList.remove(tool)
+                    # print(f'{json.dumps(self.toolsList, indent=4)}')
+        if self.toolsList:
+            self.GenerateTree()
         else:
             print("toolsTree est vide")
+
+    def GenerateTree(self):
+        for tool in self.toolsList:
+            # print(f'tool={tool}\nname={tool[0]}, bin={tool[1]}, args={tool[2]}')
+            self.toolsTree.insert('', 'end', tool[0], text=tool[0], values=[tool[1], tool[2]])
 
     def OnButtonClick(self, arg):
         print(f'You clicked button "{arg}"')
         if re.search(r'^tool', arg):
-            item = self.toolsTree.selection()
-            if item:
-                print(f'OnButtonClick: {self.toolsTree.item(item, "text")} -> {self.toolsTree.item(item, "values")}')
-                if re.search(r'top$', arg):
-                    self.toolsTree.move(item, '', 0)
-                elif re.search(r'up$', arg):
-                    index = self.toolsTree.index(item)
-                    self.toolsTree.move(item, '', index-1)
-                elif re.search(r'add$', arg):
-                    pass
-                elif re.search(r'del$', arg):
-                    self.toolsTree.delete(item)
-                    # print(f'tree={self.toolsTree.get_children()}')
-                elif re.search(r'down$', arg):
-                    index = self.toolsTree.index(item)
-                    self.toolsTree.move(item, '', index+1)
-                elif re.search(r'bottom$', arg):
-                    self.toolsTree.move(item, '', 'end')
-            else:
-                print("No item selected")
-                if re.search(r'add$', arg):
-                    pass
-                    # filename = filedialog.askopenfilename()
-                    # print(f'filename={filename}')
-                    # addToolWindow = Toplevel(self)
-                    # l1 : label + entry -> name
-                    # l2 : entry + button browse (askopenfile)
-                    # l3 : label + entry -> args
-                    # l4 : 2 boutons (OK-CANCEL)
-
-                    # entryToolWindow = Toplevel(self)
-                    # self.entryVariable = StringVar()
-                    # self.entry = Entry(entryToolWindow, textvariable=self.entryVariable)
-                    # self.entry.bind("<Return>", self.EntryOnPressReturn)
-                    # self.entryVariable.set("Application's name")
-                    # self.entry.focus_set()
-                    # self.entry.selection_range(0, END)
-                    # self.entry.grid()
-
-        if re.search(r'^file', arg):
+            self.ManageToolsButtons(arg)
+        elif re.search(r'^file', arg):
             print("In FILE statement")
+            self.ManageFilesButtons(arg)
+        else:
+            print("This tab is not manage : does not exist !")
 
-    # def EntryOnPressReturn(self, event):
-    #     if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
-    #         print("1."+self.entryVariable.get()+".")
-    #     else:
-    #         self.entryVariable.set("What's up dude ?!")
-    #         self.entry.focus_set()
-    #     self.entry.focus_set()
-    #     self.entry.selection_range(0, END)
+    def ManageToolsButtons(self, arg):
+        item = self.toolsTree.selection()
+        if item:
+            print(f'OnButtonClick: {self.toolsTree.item(item, "text")} -> {self.toolsTree.item(item, "values")}')
+            if re.search(r'top$', arg):
+                self.toolsTree.move(item, '', 0)
+            elif re.search(r'up$', arg):
+                index = self.toolsTree.index(item)
+                self.toolsTree.move(item, '', index-1)
+            elif re.search(r'add$', arg):
+                index = self.toolsTree.index(item)
+                filename = filedialog.askopenfilename(title="Select new tool",
+                    filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
+                print(f'filename={filename}')
+                p = filename.split("/")
+                name = (p[-1].split('.'))[0].capitalize()
+                path = '\\'.join(p)
+                args=''
+                self.toolsTree.insert('', index+1, name, text=name, values=[path, args])
+            elif re.search(r'del$', arg):
+                self.toolsTree.delete(item)
+                # print(f'tree={self.toolsTree.get_children()}')
+            elif re.search(r'down$', arg):
+                index = self.toolsTree.index(item)
+                self.toolsTree.move(item, '', index+1)
+            elif re.search(r'bottom$', arg):
+                self.toolsTree.move(item, '', 'end')
+            elif re.search(r'CANCEL', arg):
+                self.toolsTree.delete()
+                self.GenerateTree()
+            elif re.search(r'OK', arg):
+                pass
+        else:
+            print("No item selected")
+            if re.search(r'add$', arg):
+                filename = filedialog.askopenfilename(title="Select new tool",
+                    filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
+                print(f'filename={filename}')
+                p = filename.split("/")
+                name = (p[-1].split('.'))[0].capitalize()
+                path = '\\'.join(p)
+                args=''
+                self.toolsTree.insert('', 'end', name, text=name, values=[path, args])
+            elif re.search(r'CANCEL', arg):
+                # print(f'listItem={self.toolsTree.get_children()}')
+                listTree = self.toolsTree.get_children()
+                for item in listTree:
+                    self.toolsTree.delete(item)
+                self.GenerateTree()
+            elif re.search(r'OK', arg):
+                pass
 
-    def InitFiles(self, parent, filesTree):
+    def ManageFilesButtons(self, arg):
+        pass
+
+    def InitFiles(self, parent):
         self.filesTree = ttk.Treeview(parent)
         self.filesTree['columns'] = ("File", "Args")
         self.filesTree.column('#0', width=30, stretch=FALSE)
