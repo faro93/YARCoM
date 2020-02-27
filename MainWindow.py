@@ -34,6 +34,7 @@ class MainWindow (Tk):
         # self.button.grid(row=1, column=1, sticky='EW')
         self.grid_rowconfigure(0, weight=1)
         self.resizable(FALSE, TRUE)
+        self.minsize(1, 200)
 
         self.InitTree(self.equipmentList, 0)
 
@@ -80,7 +81,13 @@ class MainWindow (Tk):
 
     def Prefs(self):
         prefsWindowTitle = "Preferences ..."
-        prefsWindow = PrefsWindow(None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
+        prefsWindow = PrefsWindow(
+            None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
+        # config = LoadConfig(self.confFile)
+        # self.equipmentList = config.LoadEquipments()
+        # self.InitTree(self.equipmentList, 0)
+        # self.toolList = config.getTools()
+        # self.InitContextMenuWidget()
 
     def Help(self):
         helpWindowTitle = "Help..."
@@ -123,6 +130,8 @@ class MainWindow (Tk):
             self.popupMenu.grab_release()
 
     def InitTree(self, equipmentList, pad, myParent=None):
+        # if self.tree:
+        #     self.tree.clear()
         padding = ""
         for i in range(pad):    # pylint: disable=unused-variable
             padding += "   "

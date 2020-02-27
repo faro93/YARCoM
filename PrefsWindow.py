@@ -7,8 +7,13 @@ from tkinter import PhotoImage
 from tkinter import messagebox
 from tkinter import filedialog
 # from LoadConfig import LoadConfig
-import json, os
+import json
+import os
+import logging
+import requests
 from pathlib import *
+from urllib.parse import urlparse
+from URLWindow import URLWindow
 
 
 class PrefsWindow (Tk):
@@ -30,9 +35,10 @@ class PrefsWindow (Tk):
             self.toolsList = self.configuration['tools']
             self.filesList = self.configuration['files']
 
+        self.appName = appName
         self.parent = parent
         self.title(windowTitle)
-        self.appTitle = appName
+        self.appTitle = self.appName
         self.InitWindow(self.configuration)
         self.grid()
         self.minsize(600, 400)
@@ -99,8 +105,8 @@ class PrefsWindow (Tk):
         self.cancel = Button(self.cancelFrame, text="Cancel", command=lambda arg=(
             "tool CANCEL"): self.OnButtonClick(arg), width=5, padx=4, pady=4).grid(column=1, row=0)
 
-        print(f'Tools:')
-        print(f'{json.dumps(self.toolsList, indent=4)}')
+        # print(f'Tools:')
+        # print(f'{json.dumps(self.toolsList, indent=4)}')
 
         if self.configuration != False:
             for tool in self.toolsList:
@@ -110,94 +116,19 @@ class PrefsWindow (Tk):
                     self.toolsList.remove(tool)
                     # print(f'{json.dumps(self.toolsList, indent=4)}')
         if self.toolsList:
-            self.GenerateTree()
+            self.GenerateTree('tools')
         else:
-            print("toolsTree est vide")
-
-    def GenerateTree(self):
-        for tool in self.toolsList:
-            # print(f'tool={tool}\nname={tool[0]}, bin={tool[1]}, args={tool[2]}')
-            self.toolsTree.insert('', 'end', tool[0], text=tool[0], values=[tool[1], tool[2]])
-
-    def OnButtonClick(self, arg):
-        print(f'You clicked button "{arg}"')
-        if re.search(r'^tool', arg):
-            self.ManageToolsButtons(arg)
-        elif re.search(r'^file', arg):
-            print("In FILE statement")
-            self.ManageFilesButtons(arg)
-        else:
-            print("This tab is not manage : does not exist !")
-
-    def ManageToolsButtons(self, arg):
-        item = self.toolsTree.selection()
-        if item:
-            print(f'OnButtonClick: {self.toolsTree.item(item, "text")} -> {self.toolsTree.item(item, "values")}')
-            if re.search(r'top$', arg):
-                self.toolsTree.move(item, '', 0)
-            elif re.search(r'up$', arg):
-                index = self.toolsTree.index(item)
-                self.toolsTree.move(item, '', index-1)
-            elif re.search(r'add$', arg):
-                index = self.toolsTree.index(item)
-                filename = filedialog.askopenfilename(title="Select new tool",
-                    filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
-                print(f'filename={filename}')
-                p = filename.split("/")
-                name = (p[-1].split('.'))[0].capitalize()
-                path = '\\'.join(p)
-                args=''
-                self.toolsTree.insert('', index+1, name, text=name, values=[path, args])
-            elif re.search(r'del$', arg):
-                self.toolsTree.delete(item)
-                # print(f'tree={self.toolsTree.get_children()}')
-            elif re.search(r'down$', arg):
-                index = self.toolsTree.index(item)
-                self.toolsTree.move(item, '', index+1)
-            elif re.search(r'bottom$', arg):
-                self.toolsTree.move(item, '', 'end')
-            elif re.search(r'CANCEL', arg):
-                self.toolsTree.delete()
-                self.GenerateTree()
-            elif re.search(r'OK', arg):
-                pass
-        else:
-            print("No item selected")
-            if re.search(r'add$', arg):
-                filename = filedialog.askopenfilename(title="Select new tool",
-                    filetypes=(("exe files", "*.exe"), ("all files", "*.*")))
-                print(f'filename={filename}')
-                p = filename.split("/")
-                name = (p[-1].split('.'))[0].capitalize()
-                path = '\\'.join(p)
-                args=''
-                self.toolsTree.insert('', 'end', name, text=name, values=[path, args])
-            elif re.search(r'CANCEL', arg):
-                # print(f'listItem={self.toolsTree.get_children()}')
-                listTree = self.toolsTree.get_children()
-                for item in listTree:
-                    self.toolsTree.delete(item)
-                self.GenerateTree()
-            elif re.search(r'OK', arg):
-                pass
-
-    def ManageFilesButtons(self, arg):
-        pass
+            print("toolsList est vide")
 
     def InitFiles(self, parent):
         self.filesTree = ttk.Treeview(parent)
-        self.filesTree['columns'] = ("File", "Args")
-        self.filesTree.column('#0', width=30, stretch=FALSE)
-        self.filesTree.heading('#0', text="#")
-        self.filesTree.column('File', width=50, stretch=TRUE, anchor='w')
-        self.filesTree.heading('File', text="File path")
-        self.filesTree.column('Args', width=300, stretch=TRUE, anchor='w')
-        self.filesTree.heading('Args', text="Proxy")
+        self.filesTree.column('#0', stretch=TRUE)
+        self.filesTree.heading('#0', text="Path")
         self.filesTree.config(selectmode='browse')
-        self.filesTree.grid(column=0, row=0, sticky=(N, S, E, W))
+        self.filesTree.grid(column=0, row=0, sticky=(N, S, E, W), columnspan=3)
 
-        self.buttonsFrame = ttk.Frame(parent, width=100, height=100, padding=5)
-        self.buttonsFrame.grid(column=1, row=0)
+        self.buttonsFrame = ttk.Frame(parent, height=100, padding=5)
+        self.buttonsFrame.grid(column=4, row=0)
 
         self.pFilesTop = PhotoImage(file="icon_top.png")
         self.pFilesUp = PhotoImage(file="icon_up.png")
@@ -222,9 +153,257 @@ class PrefsWindow (Tk):
         bottom = Button(self.buttonsFrame, text="Bottom", image=self.pFilesBottom, command=lambda arg=(
             "file bottom"): self.OnButtonClick(arg)).grid(row=6, sticky=(E, W))
 
-        # print(f'Files:')
-        # print(f'{json.dumps(filesTree, indent=4)}')
+        self.okFrame = ttk.Frame(parent, padding=5)
+        self.okFrame.grid(column=2, row=1)
+        self.cancelFrame = ttk.Frame(parent, padding=5)
+        self.cancelFrame.grid(column=4, row=1)
 
+        self.ok = Button(self.okFrame, text="OK", command=lambda arg=(
+            "file OK"): self.OnButtonClick(arg), width=5, padx=4, pady=4).grid(column=0, row=0)
+        self.cancel = Button(self.cancelFrame, text="Cancel", command=lambda arg=(
+            "file CANCEL"): self.OnButtonClick(arg), width=5, padx=4, pady=4).grid(column=1, row=0)
+
+        # print(f'Files:')
+        # print(f'{json.dumps(self.filesList, indent=4)}')
+
+        if self.configuration != False:
+            for f in self.filesList:
+
+                if re.match(r'http', f[0]):
+                    ok = self.checkURL(f[0], f[1])
+                    if not ok:
+                        self.filesList.remove(f)
+                else:
+                    if not os.path.exists(f[0]):
+                        messagebox.showwarning("YARCoM warning", "Erasing file "+f[0] +
+                                               " :\ndoes not exist")
+                        self.filesList.remove(f)
+                # print(f'{json.dumps(self.filesList, indent=4)}')
+        if self.toolsList:
+            self.GenerateTree('files')
+        else:
+            print("filesList est vide")
+
+    def checkURL(self, file, proxy=True):
+        # Prevent InsecureRequestWarning message from being displayed
+        logging.captureWarnings(True)
+
+        result = True
+        myString = str()
+        p = urlparse(file)
+        myString += p.netloc
+
+        if proxy == False:
+            if not 'NO_PROXY' in os.environ:
+                os.environ['NO_PROXY'] = myString
+            else:
+                print("type(os.environ[\'NO_PROXY\'])={}, os.environ[\'NO_PROXY\']={}", format(
+                    type(os.environ['NO_PROXY']), os.environ['NO_PROXY']))
+                os.environ['NO_PROXY'] += ';' + myString
+
+        try:
+            requests.get(file, verify=False)
+        except requests.exceptions.ConnectionError as ce:
+            messagebox.showwarning(
+                "YARCoM warning", "Unable to load file "+str(file)+"\n"+str(ce))
+            result = False
+        except requests.exceptions.ConnectionRefusedError as cre:
+            messagebox.showwarning(
+                "YARCoM warning", "Unable to load file "+str(file)+"\n"+str(cre))
+            result = False
+
+        return result
+
+    def GenerateTree(self, notebook):
+        if re.search(r'^tools', notebook):
+            myList = self.toolsList
+            tree = self.toolsTree
+        elif re.search(r'^files', notebook):
+            myList = self.filesList
+            tree = self.filesTree
+
+        for index in myList:
+            # print(f'index={index}')
+            if re.search(r'^tools', notebook):
+                # print(f'name={index[0]}, bin={index[1]}, args={index[2]}')
+                tree.insert(
+                    '', 'end', index[0], text=index[0], values=[index[1], index[2]])
+            elif re.search(r'^files', notebook):
+                # print(f'path={index[0]}, proxy={index[1]}')
+                tree.insert(
+                    '', 'end', index[0], text=index[0], values=[index[1]])
+
+    def OnButtonClick(self, arg):
+        print(f'You clicked button "{arg}"')
+        if re.search(r'^tool', arg):
+            self.ManageButtons(arg)
+        elif re.search(r'^file', arg):
+            self.ManageButtons(arg)
+        else:
+            print("This tab is not manage : does not exist !")
+
+    def ManageButtons(self, arg):
+        if re.search(r'^tool', arg):
+            tree = self.toolsTree
+            # print(f'listItem={self.toolsTree.get_children()}')
+        elif re.search(r'^file', arg):
+            tree = self.filesTree
+            print(f'listItem={self.filesTree.get_children()}')
+
+        item = tree.selection()
+        if item:
+            """item selected"""
+            print(
+                f'OnButtonClick: {tree.item(item, "text")} -> {tree.item(item, "values")}')
+            if re.search(r'top$', arg):
+                tree.move(item, '', 0)
+            elif re.search(r'up$', arg):
+                index = tree.index(item)
+                tree.move(item, '', index-1)
+            elif re.search(r'add$', arg):
+                self.AddToList(arg, item=item)
+            elif re.search(r'add URL$', arg):
+                pass
+            elif re.search(r'add local$', arg):
+                self.AddToList(arg, item)
+            elif re.search(r'del$', arg):
+                tree.delete(item)
+                # print(f'tree={tree.get_children()}')
+            elif re.search(r'down$', arg):
+                index = tree.index(item)
+                tree.move(item, '', index+1)
+            elif re.search(r'bottom$', arg):
+                tree.move(item, '', 'end')
+            elif re.search(r'CANCEL$', arg):
+                self.Cancel(arg)
+            elif re.search(r'OK$', arg):
+                self.OK(arg)
+        else:
+            """no item selected"""
+            print("No item selected")
+            if re.search(r'add$', arg):
+                self.AddToList(arg)
+            elif re.search(r'add URL$', arg):
+                urlWindow = URLWindow(self, "Add URL file ...", "YARCoM v0.1")
+                self.wait_window(urlWindow)
+                print(f'urlWindow.result={urlWindow.result}')
+                self.AddToList(arg, result=urlWindow.result)
+            elif re.search(r'add local$', arg):
+                self.AddToList(arg)
+            elif re.search(r'CANCEL$', arg):
+                self.Cancel(arg)
+            elif re.search(r'OK$', arg):
+                self.OK(arg)
+
+    def AddToList(self, arg, item=None, result=None):
+        if re.search(r'^tool', arg):
+            tree = self.toolsTree
+            title = 'Select new tool'
+        elif re.search(r'^file', arg):
+            tree = self.filesTree
+            title = 'Select new equipment file'
+
+        if not item == None:
+            index = tree.index(item)
+
+        if re.search(r'^tool', arg):
+            if not os.name == "posix":
+                filename = filedialog.askopenfilename(title=title, filetypes=(
+                    ("exe files", "*.exe"), ("all files", "*.*")))
+            else:
+                filename = filedialog.askopenfilename(title=title)
+        elif re.search(r'^file', arg):
+            if re.search(r'add local$', arg):
+                filename = filedialog.askopenfilename(title=title, filetypes=(
+                    ("json files", "*.json"), ("all files", "*.*")))
+            elif re.search(r'add URL$', arg):
+                print(f'type(result)={type(result)}, result={result}')
+                (filename, proxy) = (result[0], result[1])
+                # print(f'filename={filename}, proxy={proxy}')
+
+        if re.search(r'^tool', arg):
+            if filename:
+                p = filename.split("/")
+                name = (p[-1].split(r'\.'))[0].capitalize()
+                if not os.name == "posix":
+                    path = '\\'.join(p)
+                    args = ''
+                else:
+                    path = filename
+                    args = ''
+                if not item == None:
+                    tree.insert('', index+1, name, text=name,
+                                values=[path, args])
+                else:
+                    tree.insert('', 'end', name, text=name,
+                                values=[path, args])
+            else:
+                print(f'No file selected for tool')
+
+        elif re.search(r'^file', arg):
+            if filename:
+                if re.search(r'http', filename):
+                    ok = self.checkURL(filename, proxy)
+                    if ok:
+                        if not item == None:
+                            tree.insert('', index+1, path,
+                                        text=path, values=[proxy])
+                        else:
+                            tree.insert('', 'end', path,
+                                        text=path, values=[proxy])
+
+                else:
+                    if not os.name == "posix":
+                        path = '\\'.join(p)
+                        proxy = 'False'
+                    else:
+                        path = filename
+                        proxy = 'False'
+                    if not item == None:
+                        tree.insert('', index+1, path,
+                                    text=path, values=[proxy])
+                    else:
+                        tree.insert('', 'end', path, text=path, values=[proxy])
+            else:
+                print(f'No file selected file')
+        print(f'listItem={self.filesTree.get_children()}')
+
+    def Cancel(self, arg):
+        if re.search(r'^tool', arg):
+            tree = self.toolsTree
+            notebook = 'tools'
+        elif re.search(r'^file', arg):
+            tree = self.filesTree
+            notebook = 'files'
+
+        listTree = tree.get_children()
+        for item in listTree:
+            tree.delete(item)
+        self.GenerateTree(notebook)
+        self.destroy()
+
+    def OK(self, arg):
+        if re.search(r'^tool', arg):
+            tree = self.toolsTree
+            notebook = 'tools'
+        elif re.search(r'^file', arg):
+            tree = self.filesTree
+            notebook = 'files'
+
+        self.configuration[notebook].clear()
+        for item in tree.get_children():
+            name = tree.item(item, "text")
+            if re.search(r'^tool', arg):
+                (path, args) = tree.item(item, "values")
+                self.configuration[notebook].append([name, path, args])
+            elif re.search(r'^file', arg):
+                proxy = tree.item(item, "values")
+                self.configuration[notebook].append([name, proxy[0]])
+
+            with open(self.configurationFile, 'w', encoding='utf-8') as cf:
+                json.dump(self.configuration, cf,
+                          ensure_ascii=False, indent=4)
+        self.destroy()
 
 
 if __name__ == "__main__":

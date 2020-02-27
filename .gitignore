@@ -156,3 +156,5 @@ images/512/minus-512.png
 images/512/plus-512.png
 images/512/toolbox.png
 images/512/trash-512.png
+tkSimpleDialog.py
+test.py

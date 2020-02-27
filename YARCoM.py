@@ -11,7 +11,7 @@ class YARCoM():
     def __init__(self):
         self.confFile = 'YARCoM.conf'
         self.appName = "YARCoM"
-        self.appVersion = "v0.1"
+        self.appVersion = "v0.7"
         self.appAuthor = "faro"
         self.windowTitle = self.getTitle()
         self.mainWindow = MainWindow(None, self.windowTitle)

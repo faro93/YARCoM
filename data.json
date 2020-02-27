@@ -1,0 +1,24 @@
+{
+    "files": [
+        [
+            "VOIP_mini.json",
+            false
+        ],
+        [
+            "other1.json",
+            false
+        ]
+    ],
+    "tools": [
+        [
+            "SSH",
+            "/usr/bin/xterm",
+            "-e /usr/bin/ssh"
+        ],
+        [
+            "FileZilla",
+            "/usr/bin/filezilla",
+            ""
+        ]
+    ]
+}
