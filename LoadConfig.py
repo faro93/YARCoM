@@ -3,7 +3,13 @@
 
 from pathlib import *
 from urllib.parse import urlparse
-import json, os, subprocess, logging, requests, sys, re
+import json
+import os
+import subprocess
+import logging
+import requests
+import sys
+import re
 from tkinter import messagebox
 
 
@@ -26,16 +32,20 @@ class LoadConfig ():
         root = dict()
         order = list()
         for file in self.configuration['files']:
+            print(f'1.file={file}')
             tree = dict()
-            if re.match(r'http', file[0]):
-                tree = self.openURL(file[0], file[1])
+            if re.match(r'http', file[1]):
+                tree = self.openURL(file[1], file[2])
+                print(f'2.tree={json.dumps(tree, indent=3)}')
             else:
-                tree = self.openLocal(file[0])
+                tree = self.openLocal(file[1])
+                print(f'3.tree={json.dumps(tree, indent=3)}')
             if 'ORDER' in tree:
                 order = self.MergeDict(root, tree, order)
             else:
                 messagebox.showwarning(
                     "YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
+        print(f'4.tree={json.dumps(tree, indent=3)}')
         return root
 
     def openURL(self, file, proxy=True):
@@ -87,13 +97,16 @@ class LoadConfig ():
 
     def getTools(self):
         if self.configuration != False:
+            delList = list()
             tools = self.configuration['tools']
             for tool in self.configuration['tools']:
                 if not os.path.exists(tool[1]):
                     # print("Erasing tool \"{}\" : does not exist".format(tools[tool]['name']))
                     messagebox.showwarning("YARCoM warning", "Erasing tool "+str(tool[0]) +
                                            " :\ndoes not exist")
-                    tools.remove(tool)
+                    delList.append(tool)
+            for tool in delList:
+                tools.remove(tool)
         return tools
 
     # def confTools(self, myDict):
@@ -107,5 +120,5 @@ if __name__ == "__main__":
     conf = LoadConfig('YARCoM.conf')
     root = conf.LoadEquipments()
     toolList = conf.getTools()
-    # print(f'{json.dumps(root, indent=4)}')
-    # print(f'{json.dumps(toolList, indent=4)}')
+    print(f'{json.dumps(root, indent=4)}')
+    print(f'{json.dumps(toolList, indent=4)}')

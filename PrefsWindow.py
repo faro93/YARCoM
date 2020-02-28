@@ -109,12 +109,15 @@ class PrefsWindow (Tk):
         # print(f'{json.dumps(self.toolsList, indent=4)}')
 
         if self.configuration != False:
+            delList = list()
             for tool in self.toolsList:
                 if not os.path.exists(tool[1]):
                     messagebox.showwarning("YARCoM warning", "Erasing tool "+tool[0] +
                                            " :\ndoes not exist")
-                    self.toolsList.remove(tool)
-                    # print(f'{json.dumps(self.toolsList, indent=4)}')
+                    delList.append(tool)
+            for tool in delList:
+                self.toolsList.remove(tool)
+                # print(f'{json.dumps(self.toolsList, indent=4)}')
         if self.toolsList:
             self.GenerateTree('tools')
         else:
@@ -209,7 +212,6 @@ class PrefsWindow (Tk):
                 if not myString in l:
                     os.environ['NO_PROXY'] += ';' + myString
 
-
         try:
             requests.get(file, verify=False)
         except requests.exceptions.ConnectionError as ce:
@@ -234,7 +236,8 @@ class PrefsWindow (Tk):
         for index in myList:
             # print(f'name={index[0]}, bin={index[1]}, args={index[2]}')
             # print(f'index={index}')
-            tree.insert('', 'end', index[0], text=index[0], values=[index[1], index[2]])
+            tree.insert('', 'end', index[0], text=index[0], values=[
+                        index[1], index[2]])
 
     def OnButtonClick(self, arg):
         print(f'You clicked button "{arg}"')
@@ -253,7 +256,7 @@ class PrefsWindow (Tk):
             tree = self.filesTree
             # print(f'listItem={self.filesTree.get_children()}')
             # for item in self.filesTree.get_children():
-                # print(f'self.filesTree.item({item})={self.filesTree.item(item)}')
+            # print(f'self.filesTree.item({item})={self.filesTree.item(item)}')
 
         item = tree.selection()
         if item:
@@ -377,7 +380,8 @@ class PrefsWindow (Tk):
                         tree.insert('', index+1, name,
                                     text=name, values=[path, proxy])
                     else:
-                        tree.insert('', 'end', name, text=name, values=[path, proxy])
+                        tree.insert('', 'end', name, text=name,
+                                    values=[path, proxy])
             else:
                 print(f'No file selected file')
         # print(f'listItem={self.filesTree.get_children()}')

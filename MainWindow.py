@@ -9,6 +9,7 @@ from AboutWindow import AboutWindow
 # from FilesWindow import FilesWindow
 from PrefsWindow import PrefsWindow
 import subprocess
+import json
 # import shlex
 
 
@@ -83,8 +84,10 @@ class MainWindow (Tk):
         prefsWindowTitle = "Preferences ..."
         prefsWindow = PrefsWindow(
             None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
-        # config = LoadConfig(self.confFile)
+        config = LoadConfig(self.confFile)
         # self.equipmentList = config.LoadEquipments()
+        eqplist = config.LoadEquipments()
+        json.dumps(eqplist, indent=3)
         # self.InitTree(self.equipmentList, 0)
         # self.toolList = config.getTools()
         # self.InitContextMenuWidget()
