@@ -122,8 +122,11 @@ class PrefsWindow (Tk):
 
     def InitFiles(self, parent):
         self.filesTree = ttk.Treeview(parent)
-        self.filesTree.column('#0', stretch=TRUE)
-        self.filesTree.heading('#0', text="Path")
+        self.filesTree['columns'] = ('Path')
+        self.filesTree.column('#0', width=50, stretch=TRUE, anchor='w')
+        self.filesTree.heading('#0', text="Name")
+        self.filesTree.column('Path', width=300, stretch=TRUE, anchor='w')
+        self.filesTree.heading('Path', text="Path")
         self.filesTree.config(selectmode='browse')
         self.filesTree.grid(column=0, row=0, sticky=(N, S, E, W), columnspan=3)
 
@@ -166,16 +169,20 @@ class PrefsWindow (Tk):
         # print(f'Files:')
         # print(f'{json.dumps(self.filesList, indent=4)}')
 
-        if self.configuration != False:
+        if self.configuration:
             for f in self.filesList:
 
-                if re.match(r'http', f[0]):
-                    ok = self.checkURL(f[0], f[1])
+                if re.match(r'http', f[1]):
+                    if f[2] == 'False':
+                        f[2] = False
+                    else:
+                        f[2] = True
+                    ok = self.checkURL(f[1], f[2])
                     if not ok:
                         self.filesList.remove(f)
                 else:
-                    if not os.path.exists(f[0]):
-                        messagebox.showwarning("YARCoM warning", "Erasing file "+f[0] +
+                    if not os.path.exists(f[1]):
+                        messagebox.showwarning("YARCoM warning", "1.Erasing file "+f[1] +
                                                " :\ndoes not exist")
                         self.filesList.remove(f)
                 # print(f'{json.dumps(self.filesList, indent=4)}')
@@ -184,7 +191,7 @@ class PrefsWindow (Tk):
         else:
             print("filesList est vide")
 
-    def checkURL(self, file, proxy=True):
+    def checkURL(self, file, proxy=None):
         # Prevent InsecureRequestWarning message from being displayed
         logging.captureWarnings(True)
 
@@ -193,13 +200,15 @@ class PrefsWindow (Tk):
         p = urlparse(file)
         myString += p.netloc
 
-        if proxy == False:
+        if not proxy:
             if not 'NO_PROXY' in os.environ:
                 os.environ['NO_PROXY'] = myString
             else:
-                print("type(os.environ[\'NO_PROXY\'])={}, os.environ[\'NO_PROXY\']={}", format(
-                    type(os.environ['NO_PROXY']), os.environ['NO_PROXY']))
-                os.environ['NO_PROXY'] += ';' + myString
+                s = os.environ['NO_PROXY']
+                l = s.split(';')
+                if not myString in l:
+                    os.environ['NO_PROXY'] += ';' + myString
+
 
         try:
             requests.get(file, verify=False)
@@ -223,15 +232,9 @@ class PrefsWindow (Tk):
             tree = self.filesTree
 
         for index in myList:
+            # print(f'name={index[0]}, bin={index[1]}, args={index[2]}')
             # print(f'index={index}')
-            if re.search(r'^tools', notebook):
-                # print(f'name={index[0]}, bin={index[1]}, args={index[2]}')
-                tree.insert(
-                    '', 'end', index[0], text=index[0], values=[index[1], index[2]])
-            elif re.search(r'^files', notebook):
-                # print(f'path={index[0]}, proxy={index[1]}')
-                tree.insert(
-                    '', 'end', index[0], text=index[0], values=[index[1]])
+            tree.insert('', 'end', index[0], text=index[0], values=[index[1], index[2]])
 
     def OnButtonClick(self, arg):
         print(f'You clicked button "{arg}"')
@@ -248,7 +251,9 @@ class PrefsWindow (Tk):
             # print(f'listItem={self.toolsTree.get_children()}')
         elif re.search(r'^file', arg):
             tree = self.filesTree
-            print(f'listItem={self.filesTree.get_children()}')
+            # print(f'listItem={self.filesTree.get_children()}')
+            # for item in self.filesTree.get_children():
+                # print(f'self.filesTree.item({item})={self.filesTree.item(item)}')
 
         item = tree.selection()
         if item:
@@ -303,7 +308,7 @@ class PrefsWindow (Tk):
             tree = self.filesTree
             title = 'Select new equipment file'
 
-        if not item == None:
+        if item is not None:
             index = tree.index(item)
 
         if re.search(r'^tool', arg):
@@ -317,21 +322,25 @@ class PrefsWindow (Tk):
                 filename = filedialog.askopenfilename(title=title, filetypes=(
                     ("json files", "*.json"), ("all files", "*.*")))
             elif re.search(r'add URL$', arg):
-                print(f'type(result)={type(result)}, result={result}')
+                # print(f'type(result)={type(result)}, result={result}')
                 (filename, proxy) = (result[0], result[1])
+                if proxy == 0:
+                    proxy = False
+                else:
+                    proxy = True
                 # print(f'filename={filename}, proxy={proxy}')
 
         if re.search(r'^tool', arg):
             if filename:
                 p = filename.split("/")
                 name = (p[-1].split(r'\.'))[0].capitalize()
-                if not os.name == "posix":
+                if os.name != "posix":
                     path = '\\'.join(p)
                     args = ''
                 else:
                     path = filename
                     args = ''
-                if not item == None:
+                if item is not None:
                     tree.insert('', index+1, name, text=name,
                                 values=[path, args])
                 else:
@@ -343,30 +352,35 @@ class PrefsWindow (Tk):
         elif re.search(r'^file', arg):
             if filename:
                 if re.search(r'http', filename):
+                    path = filename
                     ok = self.checkURL(filename, proxy)
                     if ok:
-                        if not item == None:
-                            tree.insert('', index+1, path,
-                                        text=path, values=[proxy])
+                        p = urlparse(filename)
+                        name = p.path.split(r'/')[-1]
+                        if item is not None:
+                            tree.insert('', index+1, name,
+                                        text=name, values=[path, proxy])
                         else:
-                            tree.insert('', 'end', path,
-                                        text=path, values=[proxy])
+                            tree.insert('', 'end', name,
+                                        text=name, values=[path, proxy])
 
                 else:
+                    p = filename.split("/")
+                    name = p[-1]
                     if not os.name == "posix":
                         path = '\\'.join(p)
                         proxy = 'False'
                     else:
                         path = filename
                         proxy = 'False'
-                    if not item == None:
-                        tree.insert('', index+1, path,
-                                    text=path, values=[proxy])
+                    if item is not None:
+                        tree.insert('', index+1, name,
+                                    text=name, values=[path, proxy])
                     else:
-                        tree.insert('', 'end', path, text=path, values=[proxy])
+                        tree.insert('', 'end', name, text=name, values=[path, proxy])
             else:
                 print(f'No file selected file')
-        print(f'listItem={self.filesTree.get_children()}')
+        # print(f'listItem={self.filesTree.get_children()}')
 
     def Cancel(self, arg):
         if re.search(r'^tool', arg):
@@ -397,8 +411,8 @@ class PrefsWindow (Tk):
                 (path, args) = tree.item(item, "values")
                 self.configuration[notebook].append([name, path, args])
             elif re.search(r'^file', arg):
-                proxy = tree.item(item, "values")
-                self.configuration[notebook].append([name, proxy[0]])
+                (path, proxy) = tree.item(item, "values")
+                self.configuration[notebook].append([name, path, proxy])
 
             with open(self.configurationFile, 'w', encoding='utf-8') as cf:
                 json.dump(self.configuration, cf,
