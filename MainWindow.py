@@ -84,10 +84,11 @@ class MainWindow (Tk):
         prefsWindowTitle = "Preferences ..."
         prefsWindow = PrefsWindow(
             None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
-        config = LoadConfig(self.confFile)
+        # print("ici")
+        # config = LoadConfig('YARCoM.conf')
         # self.equipmentList = config.LoadEquipments()
-        eqplist = config.LoadEquipments()
-        json.dumps(eqplist, indent=3)
+        # eqplist = config.LoadEquipments()
+        # print(f'tree={json.dumps(eqplist, indent=3)}')
         # self.InitTree(self.equipmentList, 0)
         # self.toolList = config.getTools()
         # self.InitContextMenuWidget()

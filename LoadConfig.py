@@ -32,20 +32,20 @@ class LoadConfig ():
         root = dict()
         order = list()
         for file in self.configuration['files']:
-            print(f'1.file={file}')
+            # print(f'1.file={file}')
             tree = dict()
             if re.match(r'http', file[1]):
                 tree = self.openURL(file[1], file[2])
-                print(f'2.tree={json.dumps(tree, indent=3)}')
+                # print(f'2.tree={json.dumps(tree, indent=3)}')
             else:
                 tree = self.openLocal(file[1])
-                print(f'3.tree={json.dumps(tree, indent=3)}')
+                # print(f'3.tree={json.dumps(tree, indent=3)}')
             if 'ORDER' in tree:
                 order = self.MergeDict(root, tree, order)
             else:
                 messagebox.showwarning(
                     "YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
-        print(f'4.tree={json.dumps(tree, indent=3)}')
+        # print(f'4.tree={json.dumps(tree, indent=3)}')
         return root
 
     def openURL(self, file, proxy=True):
