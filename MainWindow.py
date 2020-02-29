@@ -28,7 +28,7 @@ class MainWindow (Tk):
         # self.InitEntryWidget()
         # self.InitButtonWidget()
         self.InitMenuWidget()
-        self.InitContextMenuWidget()
+        self.InitContextMenuWidget(self.toolList)
 
         self.tree.grid(row=0, column=0, columnspan=2, sticky='NS')
         # self.entry.grid(row=1, column=0, sticky='EW')
@@ -84,14 +84,15 @@ class MainWindow (Tk):
         prefsWindowTitle = "Preferences ..."
         prefsWindow = PrefsWindow(
             None, prefsWindowTitle, self.windowTitle, "YARCoM.conf")
-        # print("ici")
-        # config = LoadConfig('YARCoM.conf')
-        # self.equipmentList = config.LoadEquipments()
-        # eqplist = config.LoadEquipments()
-        # print(f'tree={json.dumps(eqplist, indent=3)}')
-        # self.InitTree(self.equipmentList, 0)
-        # self.toolList = config.getTools()
-        # self.InitContextMenuWidget()
+        self.wait_window(prefsWindow)
+        config = LoadConfig('YARCoM.conf')
+        self.equipmentList = config.LoadEquipments()
+        eqplist = config.LoadEquipments()
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        self.InitTree(eqplist, 0)
+        self.toolList = config.getTools()
+        self.InitContextMenuWidget(self.toolList)
 
     def Help(self):
         helpWindowTitle = "Help..."
@@ -102,10 +103,10 @@ class MainWindow (Tk):
         aboutWindowTitle = "About..."
         aboutWindow = AboutWindow(None, aboutWindowTitle, self.windowTitle)
 
-    def InitContextMenuWidget(self):
+    def InitContextMenuWidget(self, toolList):
         self.popupMenu = Menu(self, tearoff=0)
         # print(toolsList)
-        for tool in sorted(self.toolList):
+        for tool in toolList:
             self.popupMenu.add_command(label=tool[0],
                                        command=lambda arg=(tool): self.RunToolFromContextMenu(arg))
 
@@ -134,8 +135,6 @@ class MainWindow (Tk):
             self.popupMenu.grab_release()
 
     def InitTree(self, equipmentList, pad, myParent=None):
-        # if self.tree:
-        #     self.tree.clear()
         padding = ""
         for i in range(pad):    # pylint: disable=unused-variable
             padding += "   "
@@ -193,7 +192,7 @@ class MainWindow (Tk):
 
     def RunToolFromTree(self):
         defaultTool = self.toolList[0]
-        # print(defaultTool)
+        print(defaultTool)
         for item in self.tree.selection():
             item_text = self.tree.item(item, "text")
             item_value = self.tree.item(item, "value")

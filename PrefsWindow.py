@@ -31,7 +31,7 @@ class PrefsWindow (Tk):
             self.configuration = False
 
         if self.configuration != False:
-            print(f'{json.dumps(self.configuration, indent=4)}')
+            # print(f'{json.dumps(self.configuration, indent=4)}')
             self.toolsList = self.configuration['tools']
             self.filesList = self.configuration['files']
 
@@ -240,7 +240,7 @@ class PrefsWindow (Tk):
                         index[1], index[2]])
 
     def OnButtonClick(self, arg):
-        print(f'You clicked button "{arg}"')
+        # print(f'You clicked button "{arg}"')
         if re.search(r'^tool', arg):
             self.ManageButtons(arg)
         elif re.search(r'^file', arg):
@@ -261,8 +261,8 @@ class PrefsWindow (Tk):
         item = tree.selection()
         if item:
             """item selected"""
-            print(
-                f'OnButtonClick: {tree.item(item, "text")} -> {tree.item(item, "values")}')
+            # print(
+            #     f'OnButtonClick: {tree.item(item, "text")} -> {tree.item(item, "values")}')
             if re.search(r'top$', arg):
                 tree.move(item, '', 0)
             elif re.search(r'up$', arg):
@@ -271,7 +271,9 @@ class PrefsWindow (Tk):
             elif re.search(r'add$', arg):
                 self.AddToList(arg, item=item)
             elif re.search(r'add URL$', arg):
-                pass
+                urlWindow = URLWindow(self, "Add URL file ...", "YARCoM v0.1")
+                self.wait_window(urlWindow)
+                self.AddToList(arg, result=urlWindow.result)
             elif re.search(r'add local$', arg):
                 self.AddToList(arg, item)
             elif re.search(r'del$', arg):
@@ -294,7 +296,6 @@ class PrefsWindow (Tk):
             elif re.search(r'add URL$', arg):
                 urlWindow = URLWindow(self, "Add URL file ...", "YARCoM v0.1")
                 self.wait_window(urlWindow)
-                print(f'urlWindow.result={urlWindow.result}')
                 self.AddToList(arg, result=urlWindow.result)
             elif re.search(r'add local$', arg):
                 self.AddToList(arg)
@@ -335,8 +336,8 @@ class PrefsWindow (Tk):
 
         if re.search(r'^tool', arg):
             if filename:
-                p = filename.split("/")
-                name = (p[-1].split(r'\.'))[0].capitalize()
+                p = filename.split(r'/')
+                name = (p[-1].split(r'.'))[0].capitalize()
                 if os.name != "posix":
                     path = '\\'.join(p)
                     args = ''
