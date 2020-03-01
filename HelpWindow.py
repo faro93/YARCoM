@@ -5,6 +5,7 @@ from tkinter import *       # pylint disable=unused-wildcard-import
 from tkinter import ttk     # pylint disable=unused-wildcard-import
 import tkinter.font as tkF
 
+
 class HelpWindow (Tk):
     def __init__(self, parent, windowTitle, appName):
         Tk.__init__(self, parent)
@@ -12,7 +13,10 @@ class HelpWindow (Tk):
         self.title(windowTitle)
         self.appTitle = appName
         self.InitWindow()
-    
+
+        self.columnconfigure(0, weight=1)
+        # self.rowconfigure(2, weight=1)
+
     def InitWindow(self):
         self.grid()
         self.geometry('500x400')
@@ -22,7 +26,8 @@ class HelpWindow (Tk):
         activeWeight = activeFont.actual('weight')
         activeSize = activeFont.actual('size')
         activeBoldFont = tkF.Font()
-        activeBoldFont.configure(family=activeFamily, size=activeSize, weight='bold')
+        activeBoldFont.configure(
+            family=activeFamily, size=activeSize, weight='bold')
         activeBoldFamily = activeBoldFont.actual('family')
         activeBoldSize = activeBoldFont.actual('size')
         activeBoldWeight = activeBoldFont.actual('weight')
@@ -43,16 +48,35 @@ class HelpWindow (Tk):
             'menu or the default one by double clicking it.'
             '\nThere are 2 files type :'
             '\n- YARCoM.conf : containing the configuration'
-            '\n- *.json : files describing your networks.'
+            '\n- *.json : one or many files describing your networks.'
             '\n\nYARCoM.conf is a JSON file containing :'
             '\n- a list of networks files'
-            '\n- a dictionnary of tools'
-            '\n{\n  \'files\':[\'file1.json\', \'file2.json\'],'
-            '\n  \'tools\': {\n    \'1\': {\n      \'name\':<name1>,\n      \'bin\': <first executable\'s binary path>,\n      \'args\': <arguments>'
-            '\n    }'
-            '\n    \'2\': {\n      \'name\':<name2>,\n      \'bin\': <second executable\'s binary path>,\n      \'args\': <arguments>'
-            '\n    }'
-            '\n  }'
+            '\n     files will be loaded in this list\'s order'
+            '\n     list contains:'
+            '\n          - lists describing equipement file to load :'
+            '\n               - the filename,'
+            '\n               - the file path,'
+            '\n               - the use of system\'s http proxy'
+            '\n- a list of tools'
+            '\n     files will be loaded in this list\'s order'
+            '\n     list contains:'
+            '\n          - lists describing tool to use :'
+            '\n               - the tool\'s name,'
+            '\n               - the tool\'s binary path,'
+            '\n               - the tool\'s arguments'
+            '\n{'
+            '\n  \'files\': [\n    [\n      \'<1st filename>\',\n      \'<1st filename\'s path>\',\n      \'<True|False>\''
+            '\n    ],'
+            '\n    [...],'
+            '\n    [\n      \'<nth filename>\',\n      \'<nth filename\'s path>\',\n      \'<True|False>\''
+            '\n    ]'
+            '\n  ]'
+            '\n  \'tools\': [\n    [\n      \'<1st tool\'s name>\',\n      \'<1st tool\'s binary path>\',\n      \'<1st tool\'s arguments>\''
+            '\n    ],'
+            '\n    [...],'
+            '\n    [\n      \'<nth tool\'s name>\',\n      \'<nth tool\'s binary path>\',\n      \'<nth tool\'s arguments>\''
+            '\n    ]'
+            '\n  ]'
             '\n}'
             '\n\nJSONs contains :'
             '\n- dictionnaries'
@@ -63,7 +87,9 @@ class HelpWindow (Tk):
             '\n}'
             '\nEach dictionnary can also contain nested dictionnaries containing sub-networks of machines. '
             'Each sub-network must have its own ORDER list. Lists at the same level will be merged.'
-            )
+            'If a branch already exists, it won\'t be loaded.'
+            '\nThe ORDER list describes the order in which the NETWORKs will be loaded.'
+        )
         text = Text(self)
         text.tag_configure('bold', font=activeBoldFont)
         text.tag_configure('normal', font=activeFont)
@@ -91,8 +117,9 @@ class HelpWindow (Tk):
         appName.grid(row=0, sticky='WE')
         # fullName.grid(row=1)
         helpText.grid(row=1, sticky='WE')
-        text.grid(row=2,sticky='WE')
+        text.grid(row=2, sticky='NSWE')
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
 
         # self.resizable(FALSE, FALSE)
 
