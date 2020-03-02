@@ -58,7 +58,10 @@ class LoadConfig ():
             if not 'NO_PROXY' in os.environ:
                 os.environ['NO_PROXY'] = mystring
             else:
-                os.environ['NO_PROXY'] += ';' + mystring
+                s = os.environ['NO_PROXY']
+                l = s.split(';')
+                if not myString in l:
+                    os.environ['NO_PROXY'] += ';' + myString
 
         try:
             r = requests.get(file, verify=False)
