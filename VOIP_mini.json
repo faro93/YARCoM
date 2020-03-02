@@ -4,6 +4,15 @@
     "MUZTC"
   ],
   "T3G": {
+    "PVCAY762": {
+      "IP": "10.5.202.197",
+      "fonction": "ASBC",
+      "reseau": "RESEAU VOIP",
+      "ville": "Cayenne",
+      "modele": "APNETNET6300",
+      "PFS": "T3G",
+      "constructeur": "ACMEPACKET"
+    },
     "PVCAE761": {
       "IP": "10.5.202.180",
       "fonction": "ASBC",
@@ -13,6 +22,7 @@
       "PFS": "T3G",
       "constructeur": "ACMEPACKET"
     }
+
   },
   "MUZTC": {
     "MUZTC728": {

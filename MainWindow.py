@@ -160,7 +160,7 @@ class MainWindow (Tk):
             self.InitTree(myDict, pad, myParent)
             pad -= 1
         else:
-            for (key, value) in myDict.items():
+            for (key, value) in sorted(myDict.items()):
                 if type(value) == dict:
                     if 'IP' in myDict[key]:
                         print("{}{}.{} : {}".format(padding,
