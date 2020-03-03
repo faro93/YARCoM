@@ -23,6 +23,11 @@ class LoadConfig ():
                 print("Configuration file "+file+" loaded.")
         else:
             print("File "+file+" does not exists")
+            nroot = {'files':[], 'tools':[]}
+            with open(self.configurationFile, 'w') as cf:
+                json.dump(nroot, cf, indent=4)
+                print(f'root={json.dumps(nroot, indent=4)}')
+                cf.close()
             self.configuration = False
 
     def LoadEquipments(self):
@@ -31,21 +36,26 @@ class LoadConfig ():
 
         root = dict()
         order = list()
-        for file in self.configuration['files']:
-            # print(f'1.file={file}')
-            tree = dict()
-            if re.match(r'http', file[1]):
-                tree = self.openURL(file[1], file[2])
-                # print(f'2.tree={json.dumps(tree, indent=3)}')
-            else:
-                tree = self.openLocal(file[1])
-                # print(f'3.tree={json.dumps(tree, indent=3)}')
-            if 'ORDER' in tree:
-                order = self.MergeDict(root, tree, order)
-            else:
-                messagebox.showwarning(
-                    "YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
-        # print(f'4.tree={json.dumps(tree, indent=3)}')
+        if self.configuration:
+            for file in self.configuration['files']:
+                # print(f'1.file={file}')
+                tree = dict()
+                if re.match(r'http', file[1]):
+                    tree = self.openURL(file[1], file[2])
+                    # print(f'2.tree={json.dumps(tree, indent=3)}')
+                else:
+                    tree = self.openLocal(file[1])
+                    # print(f'3.tree={json.dumps(tree, indent=3)}')
+                if 'ORDER' in tree:
+                    order = self.MergeDict(root, tree, order)
+                else:
+                    messagebox.showwarning(
+                        "YARCoM warning", "JSON file "+str(file)+" has no ORDER list")
+            # print(f'4.tree={json.dumps(tree, indent=3)}')
+        else:
+            messagebox.showwarning(
+                        "YARCoM warning", "Configuration file "+str(self.configuration)+
+                        " is empty")
         return root
 
     def openURL(self, file, proxy=True):
@@ -99,7 +109,8 @@ class LoadConfig ():
         return order
 
     def getTools(self):
-        if self.configuration != False:
+        tools = dict()
+        if self.configuration:
             delList = list()
             tools = self.configuration['tools']
             for tool in self.configuration['tools']:

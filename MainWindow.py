@@ -37,7 +37,9 @@ class MainWindow (Tk):
         self.resizable(FALSE, TRUE)
         self.minsize(1, 200)
 
-        self.InitTree(self.equipmentList, 0)
+        if self.equipmentList != {}:
+            # print(f'equipmentList={json.dumps(self.equipmentList, indent=4)}')
+            self.InitTree(self.equipmentList, 0)
 
     def InitTreeWidget(self):
         self.tree = ttk.Treeview(self)
@@ -90,7 +92,8 @@ class MainWindow (Tk):
         eqplist = config.LoadEquipments()
         for item in self.tree.get_children():
             self.tree.delete(item)
-        self.InitTree(eqplist, 0)
+        if eqplist != {}:
+            self.InitTree(eqplist, 0)
         self.toolList = config.getTools()
         self.InitContextMenuWidget(self.toolList)
 
@@ -191,22 +194,23 @@ class MainWindow (Tk):
         self.RunToolFromTree()
 
     def RunToolFromTree(self):
-        defaultTool = self.toolList[0]
-        print(defaultTool)
-        for item in self.tree.selection():
-            item_text = self.tree.item(item, "text")
-            item_value = self.tree.item(item, "value")
-            if item_value != "":
-                for value in item_value:
-                    print("TreeOnDoubleClick: {} -> {}".format(item_text, value))
-                    ip = value
-                    if (defaultTool[2] == ''):
-                        subprocess.Popen([defaultTool[1], ip], shell=True)
-                    else:
-                        subprocess.Popen(
-                            [defaultTool[1], defaultTool[2], ip], shell=True)
-            else:
-                self.tree.selection_remove(item)
+        if self.toolList != {}:
+            defaultTool = self.toolList[0]
+            print(defaultTool)
+            for item in self.tree.selection():
+                item_text = self.tree.item(item, "text")
+                item_value = self.tree.item(item, "value")
+                if item_value != "":
+                    for value in item_value:
+                        print("TreeOnDoubleClick: {} -> {}".format(item_text, value))
+                        ip = value
+                        if (defaultTool[2] == ''):
+                            subprocess.Popen([defaultTool[1], ip], shell=True)
+                        else:
+                            subprocess.Popen(
+                                [defaultTool[1], defaultTool[2], ip], shell=True)
+                else:
+                    self.tree.selection_remove(item)
 
     def TreeOnRightClick(self, event):
         self.PopUp(event)
