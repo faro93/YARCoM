@@ -26,7 +26,7 @@ class LoadConfig ():
             nroot = {'files':[], 'tools':[]}
             with open(self.configurationFile, 'w') as cf:
                 json.dump(nroot, cf, indent=4)
-                print(f'root={json.dumps(nroot, indent=4)}')
+                # print(f'root={json.dumps(nroot, indent=4)}')
                 cf.close()
             self.configuration = False
 
@@ -62,11 +62,11 @@ class LoadConfig ():
         tree = dict()
         mystring = str()
         p = urlparse(file)
-        mystring += p.netloc
+        myString = p.netloc
 
         if proxy == False:
             if not 'NO_PROXY' in os.environ:
-                os.environ['NO_PROXY'] = mystring
+                os.environ['NO_PROXY'] = myString
             else:
                 s = os.environ['NO_PROXY']
                 l = s.split(';')
