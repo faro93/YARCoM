@@ -25,14 +25,14 @@ class MainWindow (Tk):
         self.equipmentList = equipmentList
         self.grid()
         self.InitTreeWidget()
-        # self.InitEntryWidget()
-        # self.InitButtonWidget()
+        self.InitEntryWidget()
+        self.InitButtonWidget()
         self.InitMenuWidget()
         self.InitContextMenuWidget(self.toolList)
 
         self.tree.grid(row=0, column=0, columnspan=2, sticky='NS')
-        # self.entry.grid(row=1, column=0, sticky='EW')
-        # self.button.grid(row=1, column=1, sticky='EW')
+        self.entry.grid(row=1, column=0, sticky='EW')
+        self.button.grid(row=1, column=1, sticky='EW')
         self.grid_rowconfigure(0, weight=1)
         self.resizable(FALSE, TRUE)
         self.minsize(1, 200)
@@ -215,9 +215,40 @@ class MainWindow (Tk):
     def TreeOnRightClick(self, event):
         self.PopUp(event)
 
+    def getFullItem(self, item, tree=None):
+        # for key in self.tree.get_children():
+        #     name = key+'.'+item
+        #     NAME = key+'.'+item.upper()
+        #     if self.tree.exists(name):
+        #         print(f'find name={name}')
+        #         return name
+        #     elif self.tree.exists(NAME):
+        #         print(f'find NAME={NAME}')
+        #         return NAME
+        #     else:
+        #         print(f'did not find name={name} neither NAME={NAME}')
+        #         # item = self.getFullItem(name)
+        print(f'item={item}')
+        myKeys = self.tree.get_children()
+        print(f'myKeys={myKeys}')
+        for val in myKeys:
+            print(f'val={val}')
+            if not re.search(rf'{item}', val, re.IGNORECASE):
+                print(f'essayer avec {val}.{item}')
+        return 1
+
     def EntryOnPressReturn(self, event):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
-            print("1."+self.entryVariable.get()+".")
+            item = self.entryVariable.get()
+            print("1."+item+".")
+            # for key in self.tree.get_children():
+            #     print(f'key={key}')
+            item = self.getFullItem(item)
+            print(f'1.item={item}')
+            # if self.tree.exists(item):
+            #     print("1."+item+" exists.")
+            # else:
+            #     print("1."+item+" does not exist.")
         else:
             self.entryVariable.set("What's up dude ?!")
             self.entry.focus_set()
@@ -226,7 +257,12 @@ class MainWindow (Tk):
 
     def OnButtonClick(self):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
-            print("2."+self.entryVariable.get()+".")
+            item = self.entryVariable.get()
+            print("2."+item+".")
+            if self.tree.exists(item):
+                print("2."+item+" exists.")
+            else:
+                print("2."+item+" does not exist.")
         else:
             self.entryVariable.set("What's up dude ?!")
             self.entry.focus_set()

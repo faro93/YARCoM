@@ -41,6 +41,10 @@ class LoadConfig ():
                 # print(f'1.file={file}')
                 tree = dict()
                 if re.match(r'http', file[1]):
+                    if file[2] == 'False':
+                        file[2] = False
+                    else:
+                        file[2] = True
                     tree = self.openURL(file[1], file[2])
                     # print(f'2.tree={json.dumps(tree, indent=3)}')
                 else:

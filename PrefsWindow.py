@@ -174,7 +174,6 @@ class PrefsWindow (Tk):
 
         if self.configuration:
             for f in self.filesList:
-
                 if re.match(r'http', f[1]):
                     if f[2] == 'False':
                         f[2] = False
