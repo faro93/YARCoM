@@ -159,7 +159,6 @@ class MainWindow (Tk):
         for i in range(pad):    # pylint: disable=unused-variable
             padding += "   "
         if 'ORDER' in myDict:
-            pad += 1
             self.InitTree(myDict, pad, myParent)
             pad -= 1
         else:
@@ -215,40 +214,29 @@ class MainWindow (Tk):
     def TreeOnRightClick(self, event):
         self.PopUp(event)
 
-    def getFullItem(self, item, tree=None):
-        # for key in self.tree.get_children():
-        #     name = key+'.'+item
-        #     NAME = key+'.'+item.upper()
-        #     if self.tree.exists(name):
-        #         print(f'find name={name}')
-        #         return name
-        #     elif self.tree.exists(NAME):
-        #         print(f'find NAME={NAME}')
-        #         return NAME
-        #     else:
-        #         print(f'did not find name={name} neither NAME={NAME}')
-        #         # item = self.getFullItem(name)
-        print(f'item={item}')
-        myKeys = self.tree.get_children()
-        print(f'myKeys={myKeys}')
-        for val in myKeys:
-            print(f'val={val}')
-            if not re.search(rf'{item}', val, re.IGNORECASE):
-                print(f'essayer avec {val}.{item}')
-        return 1
+    def searchItem(self, pattern, item=''):
+        children = self.tree.get_children(item)
+        for child in children:
+            text = self.tree.item(child, 'text')
+            if text.lower() in pattern.lower():
+                self.tree.selection_set(child)
+                self.tree.see(child)
+                return True
+            else:
+                res = self.searchItem(pattern, child)
+                if res:
+                    return True
 
     def EntryOnPressReturn(self, event):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
             item = self.entryVariable.get()
             print("1."+item+".")
-            # for key in self.tree.get_children():
-            #     print(f'key={key}')
-            item = self.getFullItem(item)
-            print(f'1.item={item}')
-            # if self.tree.exists(item):
-            #     print("1."+item+" exists.")
-            # else:
-            #     print("1."+item+" does not exist.")
+            result = self.searchItem(item)
+            if result:
+                print(f'1.item={item} is in tree and selected')
+
+            else:
+                print(f'1.item={item} is not in tree')
         else:
             self.entryVariable.set("What's up dude ?!")
             self.entry.focus_set()
@@ -259,10 +247,11 @@ class MainWindow (Tk):
         if self.entryVariable.get() != "Equipment to search" and self.entryVariable.get() != "":
             item = self.entryVariable.get()
             print("2."+item+".")
-            if self.tree.exists(item):
-                print("2."+item+" exists.")
+            result = self.searchItem(item)
+            if result:
+                print(f'2.item={item} is in tree and selected')
             else:
-                print("2."+item+" does not exist.")
+                print(f'2.item={item} is not in tree')
         else:
             self.entryVariable.set("What's up dude ?!")
             self.entry.focus_set()
