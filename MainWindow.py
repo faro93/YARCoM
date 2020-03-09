@@ -218,14 +218,14 @@ class MainWindow (Tk):
         children = self.tree.get_children(item)
         for child in children:
             text = self.tree.item(child, 'text')
-            if self.tree.item(child, 'text').lower() in pattern.lower():
+            if re.search(rf'{pattern}', text, re.IGNORECASE):
                 self.tree.selection_set(child)
                 self.tree.see(child)
                 return True
-            elif  self.tree.item(child, 'value'):
+            elif self.tree.item(child, 'value'):
                 values = self.tree.item(child, 'value')
                 ip = values[0]
-                if ip in pattern.lower():
+                if re.search(rf'{pattern}', ip):
                     self.tree.selection_set(child)
                     self.tree.see(child)
                     return True
