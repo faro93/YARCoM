@@ -114,12 +114,12 @@ class MainWindow (Tk):
                                        command=lambda arg=(tool): self.RunToolFromContextMenu(arg))
 
     def RunToolFromContextMenu(self, tool):
-        print(f'tool={tool}')
+        # print(f'tool={tool}')
         item = self.popupMenu.selection
         if self.tree.exists(item):
-            print(f"{item}")
+            # print(f"{item}")
             self.tree.selection_set(item)
-            print("item: {}, tool= {}".format(self.tree.item(item), tool))
+            # print("item: {}, tool= {}".format(self.tree.item(item), tool))
             if len(self.tree.item(item)['values']) != 0:
                 ip = self.tree.item(item)['values'][0]
                 if (tool[2] == ''):
