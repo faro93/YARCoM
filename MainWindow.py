@@ -28,11 +28,13 @@ class MainWindow (Tk):
         self.InitEntryWidget()
         self.InitButtonWidget()
         self.InitMenuWidget()
+        self.InitScrollbarWidget()
         self.InitContextMenuWidget(self.toolList)
 
         self.tree.grid(row=0, column=0, columnspan=2, sticky='NS')
         self.entry.grid(row=1, column=0, sticky='EW')
-        self.button.grid(row=1, column=1, sticky='EW')
+        self.button.grid(row=1, column=1, columnspan=2, sticky='EW')
+        self.scrollbar.grid(row=0, column=2, sticky='NS')
         self.grid_rowconfigure(0, weight=1)
         self.resizable(FALSE, TRUE)
         self.minsize(1, 200)
@@ -40,6 +42,11 @@ class MainWindow (Tk):
         if self.equipmentList != {}:
             # print(f'equipmentList={json.dumps(self.equipmentList, indent=4)}')
             self.InitTree(self.equipmentList, 0)
+
+    def InitScrollbarWidget(self):
+        self.scrollbar = ttk.Scrollbar(self)
+        self.scrollbar.configure(command=self.tree.yview)
+        self.tree.configure(yscrollcommand=self.scrollbar.set)
 
     def InitTreeWidget(self):
         self.tree = ttk.Treeview(self)

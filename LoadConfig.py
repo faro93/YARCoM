@@ -7,7 +7,7 @@ import json
 import os
 import subprocess
 import logging
-import requests
+# import requests
 import sys
 import re
 from tkinter import messagebox
