@@ -10,7 +10,7 @@ from tkinter import filedialog
 import json
 import os
 import logging
-# import requests
+import requests
 from pathlib import *
 from urllib.parse import urlparse
 from URLWindow import URLWindow
