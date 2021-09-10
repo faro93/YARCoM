@@ -26,6 +26,12 @@ class URLWindow (Tk):
         fURL = ttk.Frame(fmain, padding=5)
         fURL.columnconfigure(0, weight=1)
 
+        fproxy = ttk.Frame(fmain, padding=5)
+        fproxy.columnconfigure(0, weight=1)
+
+        fauthent = ttk.Frame(fmain, padding=5)
+        fauthent.columnconfigure(0, weight=1)
+
         fbtn = ttk.Frame(fmain, padding=5)
 
         self.entryVariable = StringVar()
@@ -34,19 +40,30 @@ class URLWindow (Tk):
         self.entry.focus_set()
         self.entry.selection_range(0, END)
 
-        self.checkVar = IntVar()
-        self.check = Checkbutton(fURL, text="PROXY", variable=self.checkVar)
+        self.labelframe = LabelFrame(fproxy, text="Proxy", padx=5, pady=5)
+        self.labelframe.grid(column=0, row=1, sticky=(W, E))
 
-        self.okBtn = Button(fbtn, text="OK", command=self.OK,
-                            width=5, padx=4, pady=4)
-        self.cancelBtn = Button(fbtn, text="CANCEL", command=self.destroy,
-                                width=5, padx=4, pady=4)
+        self.checkVar = IntVar()
+        self.check = Checkbutton(self.labelframe, text="Enable", variable=self.checkVar)
+
+        self.loginLabel = Label(self.labelframe, text="User account")
+        self.loginVariable = StringVar()
+        self.loginVariable.set('User account here')
+        self.loginEntry = Entry(self.labelframe, textvariable=self.loginVariable)
+
+        self.passwd = Label(self.labelframe, text="User password")
+
+        self.okBtn = Button(fbtn, text="OK", command=self.OK, width=5, padx=4, pady=4)
+        self.cancelBtn = Button(fbtn, text="CANCEL", command=self.destroy, width=5, padx=4, pady=4)
 
         self.entry.grid(column=0, row=0, columnspan=2, sticky=(N, S, W, E))
-        self.check.grid(column=0, row=1, sticky=(N, S, W, E))
         fURL.grid(columnspan=2, column=0, row=0, sticky=(W, E))
-
-        fbtn.grid(columnspan=2, column=0, row=1)
+        self.check.grid(column=0, row=0, sticky=(W))
+        self.loginLabel.grid(column=0, row=1, sticky=(W))
+        self.loginEntry.grid(column=0, row=2, sticky=(E))
+        self.passwd.grid(column=0, row=3, sticky=(W))
+        fproxy.grid(columnspan=2, column=0, row=1, sticky=(N, S, W, E))
+        fbtn.grid(columnspan=2, column=0, row=2)
         self.okBtn.grid(column=0, row=1)
         self.cancelBtn.grid(column=1, row=1)
 
