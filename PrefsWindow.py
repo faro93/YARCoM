@@ -9,6 +9,7 @@ from tkinter import filedialog
 # from LoadConfig import LoadConfig
 import json
 import os
+import re
 import logging
 import requests
 from pathlib import *
